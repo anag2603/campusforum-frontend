@@ -23,21 +23,21 @@ html {
 // ============ Cuerpo de texto ============ 
 @font-face {
   font-family: 'Open Sans';
-  src: url('assets/fonts/OpenSans-Regular.ttf') format('truetype');
+  src: url('assets/fonts/OpenSans/OpenSans-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
-  src: url('assets/fonts/OpenSans-Medium.ttf') format('truetype');
+  src: url('assets/fonts/OpenSans/OpenSans-Medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Open Sans';
-  src: url('assets/fonts/OpenSans-SemiBold.ttf') format('truetype');
+  src: url('assets/fonts/OpenSans/OpenSans-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-display: swap;
 }
@@ -45,14 +45,14 @@ html {
 // ============ Títulos============  
 @font-face {
   font-family: 'Montserrat';
-  src: url('assets/fonts/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('assets/fonts/Montserrat/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Montserrat';
-  src: url('assets/fonts/Montserrat-Bold.ttf') format('truetype');
+  src: url('assets/fonts/Montserrat/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
   font-display: swap;
 }
