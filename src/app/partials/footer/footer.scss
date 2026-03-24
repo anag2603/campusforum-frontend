@@ -1,0 +1,92 @@
+.footer-brand {
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 3rem 1rem;
+    letter-spacing: 0.5px;
+}
+
+/* LOGO */
+.brand-forum {
+    color: var(--background-color);
+    font-weight: 100;
+}
+
+.brand-text {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--background-color);
+    text-decoration: none;
+    font-size: 2rem;
+    padding: 0.5cm;
+}
+
+/* LINKS */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.title-map {
+  font-size: 1rem;
+  color: white;
+}
+
+.map-link {
+  font-size: 0.85rem;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.map-link:hover {
+  color: var(--text-color);
+}
+
+/* REDES */
+.footer-socialmedia {
+  margin-top: 1.5rem;
+}
+
+.title-socialmedia {
+  font-size: 1rem;
+  color: white;
+  margin-bottom: 0.8rem;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  transition: 0.3s;
+}
+
+.social-icon:hover {
+  background-color: #A0D585;
+  color: #000;
+  border: none;
+}
+
+/* COPYRIGHT */
+.footer-copyright {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: white;;
+}

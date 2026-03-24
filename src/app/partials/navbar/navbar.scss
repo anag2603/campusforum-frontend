@@ -1,0 +1,87 @@
+.navbar{
+    background-color: var(--primary-color);
+    color: white;
+}
+
+// Se cambia el tamaño del navbar para que tenga espacio el logo
+.mat-toolbar{
+    height: 85px;
+}
+
+.brand-container {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.brand-logo-link {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.4rem;
+}
+
+.brand-logo {
+    width: 65px;
+    height: 65px;
+    border-radius: 50px;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: inline-flex;
+    align-items: baseline;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+
+.brand-text:hover {
+    opacity: 0.95;
+}
+
+.brand-campus,
+.brand-forum {
+    text-transform: uppercase;
+}
+
+.brand-campus {
+    color: var(--background-color);
+    font: 1.2rem 'Montserrat', sans-serif;
+    font-weight: bold;
+}
+
+.brand-forum {
+    color: var(--background-color);
+    font: 1.2rem 'Montserrat', sans-serif;
+    font-weight: 100;
+}
+
+.register-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 20px;
+}
+
+.register-btn:hover {
+    background-color: var(--secondary-dark);
+    color: white;
+}
+
+.login-btn {
+    color: white !important;
+    border-radius: var(--border-radius);
+}
+
+.login-btn:hover {
+    color: black !important;
+}
+
+.login-btn:hover i {
+    color: black !important;
+}
+
+/* Links */
+a[mat-button], button[mat-button] {
+  color: white !important;
+  font-weight: 500;
+}

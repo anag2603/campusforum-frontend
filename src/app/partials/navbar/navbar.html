@@ -1,0 +1,38 @@
+<mat-toolbar color="primary" class="navbar px-4">
+
+  <!-- Izquierda -->
+  <section class="brand-container" routerLink="/" aria-label="Ir a inicio">
+    <!-- Aquí va el logo en la parte superior izquierda -->
+    <a routerLink="/" class="brand-logo-link" aria-label="Ir a inicio">
+      <img src="assets/images/logo-blanco.png" alt="Logo CampusForum" class="brand-logo" />
+    </a>
+
+    <!-- Marca con estilo integrado naturaleza de única palabra -->
+    <a routerLink="/" class="brand-text">
+      <span class="brand-campus">CAMPUS</span>
+      <span class="brand-forum">FORUM</span>
+    </a>
+  </section>
+
+  <!-- Centro -->
+  <section class="d-none d-md-flex gap-4">
+    <a mat-button routerLink="/">Inicio</a>
+    <a mat-button routerLink="/proposito">Propósito</a>
+  </section>
+
+  <!-- Derecha -->
+  <section class="d-flex align-items-center gap-2 ms-4">
+
+    <button mat-button routerLink="/auth/login" class="d-flex align-items-center gap-1 login-btn">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Login
+    </button>
+
+    <button mat-raised-button routerLink="/auth/registro" class="register-btn">
+      <i class="bi bi-person-plus"></i>
+      Registro
+    </button>
+
+  </section>
+
+</mat-toolbar>
