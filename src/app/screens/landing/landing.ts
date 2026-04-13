@@ -79,7 +79,7 @@ export class Landing implements AfterViewInit {
       claseAvatar: 'autor__avatar--morado',
       comentarios: 19,
       vistas: '302',
-      destacado: false
+      destacado: true
     }
   ];
 
