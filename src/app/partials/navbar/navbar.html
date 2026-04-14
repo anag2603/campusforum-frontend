@@ -1,6 +1,13 @@
 <mat-toolbar color="primary" class="navbar px-4">
 
   <!-- Izquierda -->
+   <!--Menú hamburguesa fijo y para pantallas pequeñas-->
+  <button mat-icon-button class="d-md-none" 
+          (click)="onMenuSidebar()" 
+          aria-label="Abrir menú">
+    <i class="bi bi-list">  </i>
+  </button>
+
   <section class="brand-container" routerLink="/" aria-label="Ir a inicio">
     <!-- Aquí va el logo en la parte superior izquierda -->
     <a routerLink="/" class="brand-logo-link" aria-label="Ir a inicio">

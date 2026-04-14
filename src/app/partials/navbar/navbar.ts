@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports'; 
 import { RouterLink } from '@angular/router';
+import { routes } from '../../app.routes';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -13,5 +15,13 @@ import { RouterLink } from '@angular/router';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
+
+  // Notificación al componente padre para alternar la barra lateral (sidebar)
+  @Output() menuToggle = new EventEmitter<void>();
+
+  // Método para emitir el evento de alternar la barra lateral (sidebar)
+  onMenuSidebar() {
+    this.menuToggle.emit();
+  }
 
 }

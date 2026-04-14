@@ -1,0 +1,51 @@
+<nav class="ls" aria-label="Menú lateral">
+    <div class="ls__header">
+        <button class="ls__close" (click)="close()" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <!--Cuerpo-->
+    <div class="ls__body">
+        <!--Inicio-->
+        <button type="button" class="ls__link"
+            (click)="goTo(['/'])" aria-label="Ir a inicio">
+            <i class="bi bi-house-door"></i>
+            INICIO
+        </button>
+
+        <!--Propósito-->
+        <button type="button" class="ls__link"
+            (click)="goTo(['/proposito'])" aria-label="Ir a propósito">
+            <i class="bi bi-bullseye"></i>
+            PROPÓSITO
+        </button>
+
+        <!--Posts-->
+        <button type="button" class="ls__link"
+            (click)="goTo(['/posts'])" aria-label="Ir a posts">
+            <i class="bi bi-journal-text"></i>
+            POSTS
+        </button>
+
+        <!--Perfil-->
+        @if (isLogin) {
+            <button type="button" class="ls__link"
+                (click)="goTo(['/profile'])" aria-label="Ir a perfil">
+                <i class="bi bi-person"></i>
+                PERFIL
+            </button>
+        }
+
+        <!--Cerrar sesión-->
+        @if (isLogin) {
+            <button type="button" class="ls__link" (click)="logout()" aria-label="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i>
+                CERRAR SESIÓN
+            </button>
+        } @else {
+            <div class="ls__footer-spacer"></div>
+        }
+
+    </div>
+</nav>
