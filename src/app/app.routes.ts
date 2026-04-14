@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { Landing } from './screens/landing/landing';
 import { Registro } from './screens/auth/registro/registro';
-import { Login } from './screens/auth/login/login';
+import { LoginScreen } from './screens/auth/login/login';
 import { Profile } from './screens/profile/profile';
 
 // IMPLEMENTAR DESPUÉS
@@ -17,7 +17,7 @@ import { Profile } from './screens/profile/profile';
 export const routes: Routes = [
     { path: '', component: Landing, pathMatch: 'full' },
     { path: 'registro', component: Registro, pathMatch: 'full' },
-    { path: 'auth/login', component: Login, pathMatch: 'full' },
+    { path: 'login', component: LoginScreen }, //Ruteo
     { path: 'auth/registro', component: Registro, pathMatch: 'full' },
     { path: 'profile', component: Profile, pathMatch: 'full' },
 
