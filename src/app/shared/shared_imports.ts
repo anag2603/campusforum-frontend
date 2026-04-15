@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { MatRadioModule } from '@angular/material/radio';
 import {MatButtonModule} from '@angular/material/button';
 import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
 import { _MatInternalFormField } from '@angular/material/core';
@@ -24,5 +24,6 @@ export const SHARED_IMPORTS = [
     MatSelectModule,
     MatCheckboxModule,
     MatToolbarModule,
+    MatRadioModule, //Import nuevo
     
 ] as const;
