@@ -1,0 +1,176 @@
+.ls {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0;
+
+  /* Header con botón de cierre */
+  &__header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+
+    &:hover {
+      color: var(--secondary-color);
+      transform: scale(1.1);
+    }
+  }
+
+  /* Cuerpo del sidebar */
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0;
+    overflow-y: auto;
+  }
+
+  /* Enlaces del sidebar */
+  &__link {
+    background: none;
+    border: none;
+    color: white;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+    font-family: 'Montserrat', sans-serif;
+
+    i {
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding-left: 2rem;
+      color: var(--secondary-color);
+    }
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  /* Espaciador para empujar botones al pie */
+  &__footer-spacer {
+    flex: 1;
+  }
+}
+
+/* Scrollbar personalizada */
+.ls__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ls__body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ls__body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.ls {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff; /* 👈 blanco */
+  color: #1a1a1a; /* 👈 texto oscuro */
+  padding: 0;
+  border-right: 1px solid #e5e7eb; /* línea sutil */
+
+  &__header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  &__close {
+    color: #6b7280;
+
+    &:hover {
+      color: #111827;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+  }
+
+  &__link {
+    background: none;
+    border: none;
+    color: #374151; /* gris elegante */
+    padding: 0.9rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+    border-radius: 0 12px 12px 0;
+
+    i {
+      font-size: 1.2rem;
+      color: #9ca3af;
+    }
+
+    /* 🟡 HOVER */
+    &:hover {
+      background-color: #f3f4f6;
+      color: #111827;
+
+      i {
+        color: #111827;
+      }
+    }
+
+    /* 🟢 ACTIVO */
+    &.active {
+      background-color: #eef2ff;
+      color: #4f46e5; /* morado/azul elegante */
+
+      i {
+        color: #4f46e5;
+      }
+    }
+  }
+
+  &__footer-spacer {
+    flex: 1;
+  }
+}

@@ -1,13 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { routes } from '../../app.routes';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   imports: [
     ...SHARED_IMPORTS,
-  ],
+    RouterLink,
+    RouterLinkActive
+],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })

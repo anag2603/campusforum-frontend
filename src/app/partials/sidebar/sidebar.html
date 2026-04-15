@@ -8,30 +8,42 @@
     <!--Cuerpo-->
     <div class="ls__body">
         <!--Inicio-->
-        <button type="button" class="ls__link"
-            (click)="goTo(['/'])" aria-label="Ir a inicio">
+        <button type="button" class="ls__link" routerLink="/" 
+                routerLinkActive="active" aria-label="Ir a inicio">
             <i class="bi bi-house-door"></i>
             INICIO
         </button>
 
         <!--Propósito-->
         <button type="button" class="ls__link"
-            (click)="goTo(['/proposito'])" aria-label="Ir a propósito">
+                routerLink="/proposito" routerLinkActive="active" aria-label="Ir a propósito">
             <i class="bi bi-bullseye"></i>
             PROPÓSITO
         </button>
 
         <!--Posts-->
         <button type="button" class="ls__link"
-            (click)="goTo(['/posts'])" aria-label="Ir a posts">
+                routerLink="/posts" routerLinkActive="active" aria-label="Ir a posts">
             <i class="bi bi-journal-text"></i>
             POSTS
+        </button>
+
+        <button type="button" class="ls__link"
+                routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
+            <i class="bi bi-people"></i>
+            LOGIN
+        </button>
+
+        <button type="button" class="ls__link"
+                routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
+            <i class="bi bi-person-plus"></i>
+            REGISTRO
         </button>
 
         <!--Perfil-->
         @if (isLogin) {
             <button type="button" class="ls__link"
-                (click)="goTo(['/profile'])" aria-label="Ir a perfil">
+                    routerLink="/profile" routerLinkActive="active" aria-label="Ir a perfil">
                 <i class="bi bi-person"></i>
                 PERFIL
             </button>
