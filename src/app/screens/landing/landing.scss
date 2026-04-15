@@ -1242,3 +1242,11 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
     .tarjeta-post--destacado { grid-column: span 2; }
   }
 }
+
+.drawer-container {
+  height: 100vh;
+}
+
+.hero_drawer {
+  width: 280px; /* o el que uses */
+}

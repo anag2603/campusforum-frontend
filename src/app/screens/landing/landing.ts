@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
 import { Footer } from "../../partials/footer/footer";
+import { Sidebar } from '../../partials/sidebar/sidebar';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -12,13 +13,22 @@ import { CommonModule } from '@angular/common';
     ...SHARED_IMPORTS,
     Navbar,
     Footer,
+    Sidebar,
     RouterLink,
     CommonModule
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
+
 export class Landing implements AfterViewInit {
+
+  // Controla si la barra lateral (sidebar) está abierta
+  public isSidebarOpen: boolean = false;
+
+  // Simulación de estado de inicio de sesión
+  // TODO: Se debe reemplazar con un servicio de autenticación real
+  public isLogin: boolean = false;
 
   // Controla si el menú hamburguesa está abierto (móvil)
   public menuAbierto = false;
@@ -82,6 +92,16 @@ export class Landing implements AfterViewInit {
       destacado: true
     }
   ];
+
+  // Método para cerrar la barra lateral (sidebar)
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
+  // Método para alternar la visibilidad de la barra lateral (sidebar)
+  public toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   public alternarMenu(): void {
     this.menuAbierto = !this.menuAbierto;
