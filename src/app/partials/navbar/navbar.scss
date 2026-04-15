@@ -1,6 +1,7 @@
 .navbar{
     background-color: var(--primary-color);
     color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 // Se cambia el tamaño del navbar para que tenga espacio el logo
@@ -8,11 +9,46 @@
     height: 85px;
 }
 
+mat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-center {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.nav-left,
+.nav-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.nav-left {
+  justify-content: flex-start;
+}
+
+.nav-right {
+  justify-content: flex-end;
+  gap: 20px;
+}
+
 .brand-container {
     cursor: pointer;
     display: flex;
     align-items: center;
+    white-space: nowrap;
+    gap: 8px;
 }
+
+.brand-container:hover .brand-logo {
+  transform: rotate(-5deg) scale(1.05);
+}
+
 .brand-logo-link {
     display: inline-flex;
     align-items: center;
@@ -24,12 +60,13 @@
     height: 65px;
     border-radius: 50px;
     object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
 .brand-text {
     display: inline-flex;
     align-items: baseline;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #fff;
     text-decoration: none;
@@ -42,17 +79,15 @@
 .brand-campus,
 .brand-forum {
     text-transform: uppercase;
+    color: var(--background-color);
+    font: 1.4rem 'Montserrat', sans-serif;
 }
 
 .brand-campus {
-    color: var(--background-color);
-    font: 1.2rem 'Montserrat', sans-serif;
     font-weight: bold;
 }
 
 .brand-forum {
-    color: var(--background-color);
-    font: 1.2rem 'Montserrat', sans-serif;
     font-weight: 100;
 }
 
@@ -60,6 +95,7 @@
     background-color: var(--secondary-color);
     color: white;
     border-radius: 20px;
+    font-size: 1rem;
 }
 
 .register-btn:hover {
@@ -69,11 +105,13 @@
 
 .login-btn {
     color: white !important;
-    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: 0.3s;
 }
 
 .login-btn:hover {
     color: black !important;
+    opacity: 0.7;
 }
 
 .login-btn:hover i {
@@ -81,7 +119,120 @@
 }
 
 /* Links */
-a[mat-button], button[mat-button] {
-  color: white !important;
-  font-weight: 500;
+a[mat-button] {
+    position: relative;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 1rem;
+}
+
+a[mat-button]::after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    width: 0%;
+    height: 2px;
+    background: white;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+a[mat-button]:hover::after {
+    width: 60%;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .mat-toolbar {
+        height: 70px;
+        padding: 0 10px;
+    }
+
+    .brand-logo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .nav-right {
+        gap: 10px;
+    }
+
+    .brand-container {
+        gap: 5px;
+    }
+
+    .register-btn {
+        padding: 5px 12px;
+        font-size: 0.9rem;
+    }
+
+    .nav-center {
+        justify-content: center;
+    }
+
+}
+
+@media (min-width: 768px) {
+
+  .nav-left {
+    flex: 0 0 auto;
+  }
+
+  .nav-center {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
+
+  .nav-right {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+}
+
+@media (max-width: 576px) {
+    .mat-toolbar {
+        height: 65px;
+    }
+
+    .brand-logo {
+        width: 45px;
+        height: 45px;
+    }
+
+    .brand-container {
+        gap: 5px;
+    }
+}
+
+@media (max-width: 400px) {
+    .brand-text {
+        display: none;
+    }
+}
+
+
+/* Botón de hamburguesa */
+button[mat-icon-button] {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+button[mat-icon-button] i {
+    font-size: 1.5rem;
+    transition: 0.3s;
+}
+
+/* Hover bonito */
+button[mat-icon-button]:hover {
+    background-color: rgba(247, 247, 247);
+}
+
+button[mat-icon-button]:hover i {
+    transform: scale(1.1);
+}
+
+button[mat-icon-button]:active {
+    transform: scale(0.9);
 }

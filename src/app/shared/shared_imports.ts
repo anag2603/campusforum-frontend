@@ -2,14 +2,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {MatButtonModule} from '@angular/material/button';
-import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
-import { _MatInternalFormField } from '@angular/material/core';
+import {MatCheckbox, MatCheckboxModule} from '@angular/material/checkbox';
+import {_MatInternalFormField} from '@angular/material/core';
 import {MatDividerModule} from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatFormField, MatInputModule} from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import {MatSelectModule} from '@angular/material/select';
 import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 
 export const SHARED_IMPORTS = [
@@ -24,5 +25,6 @@ export const SHARED_IMPORTS = [
     MatSelectModule,
     MatCheckboxModule,
     MatToolbarModule,
+    MatSidenavModule,
     
 ] as const;

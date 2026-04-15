@@ -1,45 +1,45 @@
-<mat-toolbar color="primary" class="navbar px-4">
+<mat-toolbar color="primary" class="navbar px-2 px-md-4">
 
-  <!-- Izquierda -->
-   <!--Menú hamburguesa fijo y para pantallas pequeñas-->
-  <button mat-icon-button class="d-md-none" 
-          (click)="onMenuSidebar()" 
-          aria-label="Abrir menú">
-    <i class="bi bi-list">  </i>
-  </button>
-
-  <section class="brand-container" routerLink="/" aria-label="Ir a inicio">
-    <!-- Aquí va el logo en la parte superior izquierda -->
-    <a routerLink="/" class="brand-logo-link" aria-label="Ir a inicio">
-      <img src="assets/images/logo-blanco.png" alt="Logo CampusForum" class="brand-logo" />
-    </a>
-
-    <!-- Marca con estilo integrado naturaleza de única palabra -->
-    <a routerLink="/" class="brand-text">
-      <span class="brand-campus">CAMPUS</span>
-      <span class="brand-forum">FORUM</span>
-    </a>
-  </section>
-
-  <!-- Centro -->
-  <section class="d-none d-md-flex gap-4">
-    <a mat-button routerLink="/">Inicio</a>
-    <a mat-button routerLink="/proposito">Propósito</a>
-  </section>
-
-  <!-- Derecha -->
-  <section class="d-flex align-items-center gap-2 ms-4">
-
-    <button mat-button routerLink="/login" class="d-flex align-items-center gap-1 login-btn">
-      <i class="bi bi-box-arrow-in-right"></i>
-      Login
+  <!-- IZQUIERDA -->
+  <div class="nav-left d-flex align-items-center">
+    <button mat-icon-button class="d-md-none" (click)="onMenuSidebar()">
+      <i class="bi bi-list"></i>
     </button>
+  </div>
 
-    <button mat-raised-button routerLink="/registro" class="register-btn">
-      <i class="bi bi-person-plus"></i>
-      Registro
-    </button>
+  <!-- CENTRO -->
+  <div class="nav-center">
+    <section class="brand-container" routerLink="/">
+      <a class="brand-logo-link">
+        <img src="assets/images/logo-blanco.png" class="brand-logo" />
+      </a>
+      <a class="brand-text">
+        <span class="brand-campus">CAMPUS</span>
+        <span class="brand-forum">FORUM</span>
+      </a>
+    </section>
+  </div>
 
-  </section>
+  <!-- DERECHA -->
+  <div class="nav-right d-flex align-items-center gap-3">
+
+    <section class="d-none d-md-flex gap-4">
+      <a mat-button routerLink="/">Inicio</a>
+      <a mat-button routerLink="/proposito">Propósito</a>
+    </section>
+
+    <!-- Desktop -->
+    <section class="d-none d-md-flex align-items-center gap-2">
+      <button mat-button routerLink="/login" class="login-btn">
+        Login
+      </button>
+
+      <button mat-raised-button routerLink="/registro" class="register-btn">
+        Registro
+      </button>
+
+    </section>
+
+  </div>
 
 </mat-toolbar>
