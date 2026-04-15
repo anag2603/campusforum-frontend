@@ -1,0 +1,101 @@
+<section class="registro-container">
+
+  <div class="registro-card">
+
+    <div class="registro-icono"></div>
+
+    <h1 class="titulo">Registro de Usuario</h1>
+
+    <label class="label">Nombres *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.first_name" placeholder="Ej: Juan Carlos">
+    </mat-form-field>
+    @if (errors.first_name) {
+      <div class="error">{{ errors.first_name }}</div>
+    }
+
+    <div class="row">
+      <div class="col">
+        <label class="label">Ap. Paterno *</label>
+        <mat-form-field appearance="outline">
+          <input matInput [(ngModel)]="user.last_name" placeholder="Ej: García">
+        </mat-form-field>
+      </div>
+
+      <div class="col">
+        <label class="label">Ap. Materno *</label>
+        <mat-form-field appearance="outline">
+          <input matInput placeholder="Ej: López">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <label class="label">Correo Institucional *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.email" placeholder="ejemplo@institucion.edu.mx">
+    </mat-form-field>
+    @if (errors.email) {
+      <div class="error">{{ errors.email }}</div>
+    }
+
+    <label class="label">Contraseña *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.password" [type]="inputType_1" placeholder="Mínimo 8 caracteres">
+      <mat-icon matSuffix (click)="showPassword()">visibility</mat-icon>
+    </mat-form-field>
+    @if (errors.password) {
+      <div class="error">{{ errors.password }}</div>
+    }
+    
+    <label class="label">Confirmar Contraseña *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.confirmar_password" [type]="inputType_2" placeholder="Repita su contraseña">
+      <mat-icon matSuffix (click)="showPassword2()">visibility</mat-icon>
+    </mat-form-field>
+    @if (errors.confirmar_password) {
+      <div class="error">{{ errors.confirmar_password }}</div>
+    }
+
+    <!-- ROLES -->
+    <label class="label">Seleccione su Rol *</label>
+    <div class="roles">
+
+      <div class="rol-card">
+        <mat-radio-button value="estudiante">Estudiante</mat-radio-button>
+      </div>
+
+      <div class="rol-card">
+        <mat-radio-button value="profesor">Profesor</mat-radio-button>
+      </div>
+
+    </div>
+
+    <!-- Términos -->
+          <mat-checkbox class="example-margin" [(ngModel)]="user.terminos_condiciones">
+            Acepto los
+            <span class="label-pwd" (click)="terminosCondiciones()" style="cursor: pointer;">
+              Términos y Condiciones
+            </span>
+          </mat-checkbox>
+          @if (errors.terminos_condiciones) {
+          <div class="invalid-feedback">{{ errors.terminos_condiciones }}</div>
+          }
+
+
+    <!-- BOTÓN -->
+    <button class="btn-registro" (click)="registrar()">
+      Registrarse
+    </button>
+
+      <hr>
+          <!-- Se agrega el botón para ir a login. -->
+          <div class="bottom-link">
+            <span class="txt-registro">
+              ¿Ya tienes una cuenta?
+              <span class="red" (click)="goLogin()"> Inicia sesión</span>
+            </span>
+          </div>
+
+  </div>
+
+</section>

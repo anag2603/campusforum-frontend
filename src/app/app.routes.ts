@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 
 import { Landing } from './screens/landing/landing';
-import { Registro } from './screens/auth/registro/registro';
-import { LoginScreen } from './screens/auth/login/login';
+import { RegistroScreen } from './screens/registro/registro'; //Ruteo
+import { LoginScreen } from './screens/login/login';
 import { Profile } from './screens/profile/profile';
 
 // IMPLEMENTAR DESPUÉS
@@ -16,9 +16,8 @@ import { Profile } from './screens/profile/profile';
 
 export const routes: Routes = [
     { path: '', component: Landing, pathMatch: 'full' },
-    { path: 'registro', component: Registro, pathMatch: 'full' },
     { path: 'login', component: LoginScreen }, //Ruteo
-    { path: 'auth/registro', component: Registro, pathMatch: 'full' },
+    { path: 'registro', component: RegistroScreen, pathMatch: 'full' }, //Ruteo
     { path: 'profile', component: Profile, pathMatch: 'full' },
 
     // IMPLEMENTAR DESPUÉS
