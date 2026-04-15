@@ -1,5 +1,5 @@
 .navbar{
-    background-color: var(--primary-color);
+    background-color: #414f63;
     color: white;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
@@ -110,12 +110,11 @@ mat-toolbar {
 }
 
 .login-btn:hover {
-    color: black !important;
-    opacity: 0.7;
+    color: var(--secondary-light) !important;
 }
 
 .login-btn:hover i {
-    color: black !important;
+    color: var(--secondary-light) !important;
 }
 
 /* Links */
