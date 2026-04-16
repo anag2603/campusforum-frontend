@@ -27,8 +27,8 @@ export class Landing implements AfterViewInit {
   public isSidebarOpen: boolean = false;
 
   // Simulación de estado de inicio de sesión
-  // TODO: Se debe reemplazar con un servicio de autenticación real
-  public isLogin: boolean = false;
+  // TODO: Se debe reemplazar con un servicio de autenticación real 
+  public isLogin: boolean = true; // Por ahora se asume que el usuario está logueado para mostrar funcionalidades
 
   // Controla si el menú hamburguesa está abierto (móvil)
   public menuAbierto = false;

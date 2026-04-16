@@ -27,6 +27,7 @@ export class Sidebar {
   // Método para emitir el evento de cierre de la barra lateral (sidebar)
   close() {
     this.closeSidebar.emit();
+    this.isLogin = false; // Simulación de cierre de sesión, se debe reemplazar con lógica real de autenticación
   }
 
   // Método para navegar a una ruta específica y cerrar la barra lateral (sidebar)
