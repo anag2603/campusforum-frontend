@@ -22,17 +22,18 @@
                 <!-- CARD IZQUIERDA (AVATAR + INFO GENERAL) -->
                 <div class="profile-card">
 
-                <!-- Avatar -->
-                <div class="avatar-section">
-                    <img [src]="user.avatar || '../../../assets/images/avatares/avatar-original.png'" alt="Avatar" class="avatar-img">
-                    <button class="btn-change-avatar" (click)="toggleAvatarGallery()">
-                        Cambiar avatar
-                    </button>
-                </div>
+                    <!-- Avatar -->
+                    <div class="avatar-section">
+                        <img [src]="user.avatar || '../../../assets/images/avatares/avatar-original.png'" alt="Avatar" class="avatar-img">
+                        <button class="btn-change-avatar" (click)="toggleAvatarGallery()">
+                            Cambiar avatar
+                        </button>
+                    </div>
 
-                <!-- Rol -->
-                <div class="role-badge">
-                    <span>Estudiante</span>
+                    <!-- Rol -->
+                    <div class="role-badge">
+                        <span>Estudiante</span>
+                        
                 </div>
 
                 </div>
@@ -40,25 +41,29 @@
                 <!-- INFORMACIÓN DEL USUARIO -->
                 <div class="profile-info">
 
-                <div class="info-group">
-                    <label>Nombre(s)</label>
-                    <p>{{ user.first_name }}</p>
-                </div>
+                    <div class="info-group">
+                        <i class="bi bi-person"></i>
+                        <label>Nombre(s)</label>
+                        <p>{{ user.first_name }}</p>
+                    </div>
 
-                <div class="info-group">
-                    <label>Apellido paterno</label>
-                    <p>{{ user.last_name }}</p>
-                </div>
+                    <div class="info-group">
+                        <i class="bi bi-person"></i>
+                        <label>Apellido paterno</label>
+                        <p>{{ user.last_name }}</p>
+                    </div>
 
-                <div class="info-group">
-                    <label>Apellido materno</label>
-                    <!--<p>{{ user.last_name }}</p>-->
-                </div>
+                    <div class="info-group">
+                        <i class="bi bi-person"></i>
+                        <label>Apellido materno</label>
+                        <!--<p>{{ user.last_name }}</p>-->
+                    </div>
 
-                <div class="info-group">
-                    <label>Correo institucional</label>
-                    <p>{{ user.email }}</p>
-                </div>
+                    <div class="info-group">
+                        <i class="bi bi-envelope"></i>
+                        <label>Correo institucional</label>
+                        <p>{{ user.email }}</p>
+                    </div>
 
                 </div>
 
@@ -79,7 +84,7 @@
                             (click)="selectAvatar('../../assets/images/avatares/avatar-mono.png')">
 
                         <img src="../../../assets/images/avatares/avatar-navidad-lentes.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/avatares/avatar-navidad-lentes.png')">
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-navidad-lentes.png')">
 
                         <img src="../../../assets/images/avatares/avatar-original.png" class="avatar-option" 
                             (click)="selectAvatar('../../assets/images/avatares/avatar-original.png')">
