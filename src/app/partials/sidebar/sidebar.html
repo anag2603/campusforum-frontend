@@ -28,29 +28,28 @@
             POSTS
         </button>
 
-        <button type="button" class="ls__link"
-                routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
-            <i class="bi bi-people"></i>
-            LOGIN
-        </button>
+        @if (!isLogin) {
+            <button type="button" class="ls__link"
+                    routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
+                <i class="bi bi-people"></i>
+                LOGIN
+            </button>
 
-        <button type="button" class="ls__link"
-                routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
-            <i class="bi bi-person-plus"></i>
-            REGISTRO
-        </button>
+            <button type="button" class="ls__link"
+                    routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
+                <i class="bi bi-person-plus"></i>
+                REGISTRO
+            </button>
+        }
 
-        <!--Perfil-->
         @if (isLogin) {
+            <!--Perfil-->
             <button type="button" class="ls__link"
                     routerLink="/profile" routerLinkActive="active" aria-label="Ir a perfil">
                 <i class="bi bi-person"></i>
                 PERFIL
             </button>
-        }
-
-        <!--Cerrar sesión-->
-        @if (isLogin) {
+            <!--Cerrar sesión-->
             <button type="button" class="ls__link" (click)="logout()" aria-label="Cerrar sesión">
                 <i class="bi bi-box-arrow-right"></i>
                 CERRAR SESIÓN
