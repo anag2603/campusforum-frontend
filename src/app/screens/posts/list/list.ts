@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
-import { LeftSidebar } from '../../../partials/left-sidebar/left-sidebar';
 import { Footer } from '../../../partials/footer/footer';
+import { Sidebar } from "../../../partials/sidebar/sidebar";
 
 type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 
@@ -23,9 +23,10 @@ interface PostItem {
   imports: [
     ...SHARED_IMPORTS,
     Navbar,
-    LeftSidebar,
+    Sidebar,
     Footer,
-  ],
+    Sidebar
+],
   templateUrl: './list.html',
   styleUrls: ['./list.scss'],
 })

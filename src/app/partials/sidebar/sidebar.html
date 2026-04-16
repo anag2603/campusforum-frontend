@@ -1,62 +1,74 @@
-<nav class="ls" aria-label="Menú lateral">
-    <div class="ls__header">
-        <button class="ls__close" (click)="close()" aria-label="Cerrar menú">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
+    <nav class="ls" aria-label="Menú lateral">
+        <div class="ls__header">
+            <button class="ls__close" (click)="close()" aria-label="Cerrar menú">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
 
-    <!--Cuerpo-->
-    <div class="ls__body">
-        <!--Inicio-->
-        <button type="button" class="ls__link" routerLink="/" 
-                routerLinkActive="active" aria-label="Ir a inicio">
-            <i class="bi bi-house-door"></i>
-            INICIO
-        </button>
+        <!--Cuerpo-->
+        <div class="ls__body">
+            <!--Inicio-->
+            <button type="button" class="ls__link" routerLink="/" 
+                    routerLinkActive="active" aria-label="Ir a inicio">
+                <i class="bi bi-house-door"></i>
+                INICIO
+            </button>
 
-        <!--Propósito-->
-        <button type="button" class="ls__link"
-                routerLink="/proposito" routerLinkActive="active" aria-label="Ir a propósito">
-            <i class="bi bi-bullseye"></i>
-            PROPÓSITO
-        </button>
-
-        <!--Posts-->
-        <button type="button" class="ls__link"
-                routerLink="/posts" routerLinkActive="active" aria-label="Ir a posts">
-            <i class="bi bi-journal-text"></i>
-            POSTS
-        </button>
-
-        @if (!isLogin) {
+            <!--Propósito-->
             <button type="button" class="ls__link"
-                    routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
-                <i class="bi bi-people"></i>
-                LOGIN
+                    routerLink="/proposito" routerLinkActive="active" aria-label="Ir a propósito">
+                <i class="bi bi-bullseye"></i>
+                PROPÓSITO
             </button>
 
+            <!--Posts-->
             <button type="button" class="ls__link"
-                    routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
-                <i class="bi bi-person-plus"></i>
-                REGISTRO
+                    routerLink="/posts" routerLinkActive="active" aria-label="Ir a posts">
+                <i class="bi bi-journal-text"></i>
+                POSTS
             </button>
-        }
 
-        @if (isLogin) {
-            <!--Perfil-->
+            <!-- Categorias -->
             <button type="button" class="ls__link"
-                    routerLink="/profile" routerLinkActive="active" aria-label="Ir a perfil">
-                <i class="bi bi-person"></i>
-                PERFIL
+                    routerLink="/categorias" routerLinkActive="active" aria-label="Ir a categorías">
+                <i class="bi bi-tags"></i>
+                CATEGORÍAS
             </button>
-            <!--Cerrar sesión-->
-            <button type="button" class="ls__link" (click)="logout()" aria-label="Cerrar sesión">
-                <i class="bi bi-box-arrow-right"></i>
-                CERRAR SESIÓN
-            </button>
-        } @else {
-            <div class="ls__footer-spacer"></div>
-        }
 
-    </div>
-</nav>
+            @if (!isLogin) {
+                <button type="button" class="ls__link"
+                        routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
+                    <i class="bi bi-people"></i>
+                    LOGIN
+                </button>
+
+                <button type="button" class="ls__link"
+                        routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
+                    <i class="bi bi-person-plus"></i>
+                    REGISTRO
+                </button>
+            }
+
+            @if (isLogin) {
+                <!--Perfil-->
+                <button type="button" class="ls__link"
+                        routerLink="/profile" routerLinkActive="active" aria-label="Ir a perfil">
+                    <i class="bi bi-person"></i>
+                    PERFIL
+                </button>
+                <!--Cerrar sesión-->
+                <button type="button" class="ls__link" (click)="logout()" aria-label="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                    CERRAR SESIÓN
+                </button>
+                @if (isProfesorOrAdmin) {
+                    <!-- Dashboard -->
+                    <button type="button" routerLink="/dashboard" class="ls__link" aria-label="Ir a dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        DASHBOARD
+                    </button>
+                }
+            }
+
+        </div>
+    </nav>

@@ -4,7 +4,7 @@
   <mat-drawer-container class="categories-form__drawer-container" autosize>
     <mat-drawer class="categories-form__drawer" mode="over" position="start" [opened]="drawerOpen"
       (closedStart)="drawerOpen = false">
-      <app-left-sidebar [userRole]="userRole" (closeSidebar)="closeSidebar()"></app-left-sidebar>
+      <app-sidebar [userRole]="userRole" (closeSidebar)="closeSidebar()"></app-sidebar>
     </mat-drawer>
 
     <mat-drawer-content class="categories-form__content">

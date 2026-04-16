@@ -1,10 +1,13 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Input, Output, inject } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
 import { Footer } from "../../partials/footer/footer";
 import { Sidebar } from '../../partials/sidebar/sidebar';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+
+type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
+type NavbarMode = 'public' | 'private';
 
 @Component({
   selector: 'app-landing',
@@ -23,12 +26,12 @@ import { CommonModule } from '@angular/common';
 
 export class Landing implements AfterViewInit {
 
+  @Input() userRole: UserRole = 'PROFESOR'; // TODO: Reemplazar con datos de un servicio de autenticación real
+  @Input() mode: NavbarMode = 'private';
+  @Input() isLogin: boolean = true; // TODO: Se debe reemplazar con datos de un servicio de autenticación real
+
   // Controla si la barra lateral (sidebar) está abierta
   public isSidebarOpen: boolean = false;
-
-  // Simulación de estado de inicio de sesión
-  // TODO: Se debe reemplazar con un servicio de autenticación real 
-  public isLogin: boolean = true; // Por ahora se asume que el usuario está logueado para mostrar funcionalidades
 
   // Controla si el menú hamburguesa está abierto (móvil)
   public menuAbierto = false;

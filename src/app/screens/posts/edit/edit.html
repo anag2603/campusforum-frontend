@@ -13,10 +13,10 @@
       [opened]="drawerOpen"
       (closedStart)="drawerOpen = false"
     >
-      <app-left-sidebar
+      <app-sidebar
         [userRole]="userRole"
         (closeSidebar)="closeSidebar()"
-      ></app-left-sidebar>
+      ></app-sidebar>
     </mat-drawer>
 
     <mat-drawer-content class="posts-edit__content">

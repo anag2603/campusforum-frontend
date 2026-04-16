@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
-import { routes } from '../../app.routes';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
+type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 @Component({
   selector: 'app-sidebar',
   imports: [
@@ -18,16 +18,16 @@ export class Sidebar {
   // Recibe el estado de visibilidad de la barra lateral (sidebar) desde el componente padre
   @Input() isSidebarOpen: boolean = false;
   @Input() isLogin: boolean = false;
+  @Input() userRole: UserRole = 'ESTUDIANTE';
 
   // Método para cerrar la barra lateral (sidebar)
   @Output() closeSidebar = new EventEmitter<void>();
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   // Método para emitir el evento de cierre de la barra lateral (sidebar)
   close() {
     this.closeSidebar.emit();
-    this.isLogin = false; // Simulación de cierre de sesión, se debe reemplazar con lógica real de autenticación
   }
 
   // Método para navegar a una ruta específica y cerrar la barra lateral (sidebar)
@@ -40,9 +40,16 @@ export class Sidebar {
   logout() {
     // Aquí puedes agregar la lógica para cerrar sesión, como limpiar tokens, redirigir a la página de inicio de sesión, etc.
     console.log('Cerrando sesión...');
+    //TODO: Agregar auth.service.logout() para limpiar tokens, etc.
     this.router.navigate(['/']);
     this.close();
   }
 
+public get isProfesorOrAdmin(): boolean {
+  return (
+    this.userRole === 'PROFESOR' ||
+    this.userRole === 'ADMINISTRADOR'
+  );
+}
 
 }

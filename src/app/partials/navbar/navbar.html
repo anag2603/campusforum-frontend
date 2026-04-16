@@ -9,11 +9,11 @@
 
   <!-- CENTRO -->
   <div class="nav-center">
-    <section class="brand-container" routerLink="/">
+    <section class="brand-container" (click)="goToInicio()">
       <a class="brand-logo-link">
         <img src="assets/images/logo-blanco.png" class="brand-logo" />
       </a>
-      <a class="brand-text">
+      <a class="brand-text" (click)="goToInicio()">
         <span class="brand-campus">CAMPUS</span>
         <span class="brand-forum">FORUM</span>
       </a>
@@ -30,13 +30,31 @@
 
     <!-- Desktop -->
     <section class="d-none d-md-flex align-items-center gap-2">
-      <button mat-button routerLink="/login" class="login-btn">
-        Login
-      </button>
+      @if (isPublic && !isLogin) {
+        <button mat-button routerLink="/login" class="login-btn">
+          Login
+        </button>
 
-      <button mat-raised-button routerLink="/registro" class="register-btn">
-        Registro
-      </button>
+        <button mat-raised-button routerLink="/registro" class="register-btn">
+          Registro
+        </button>
+      }
+
+      @if (isPrivate && isLogin) {
+        <button mat-button routerLink="/profile" class="profile-btn">
+          Perfil
+        </button>
+
+        @if (isProfesorOrAdmin) {
+          <button mat-button routerLink="/dashboard" class="dashboard-btn">
+            Dashboard
+          </button>
+        }
+
+        <button mat-button (click)="logout()" class="logout-btn">
+          Cerrar sesión
+        </button>
+      }
 
     </section>
 

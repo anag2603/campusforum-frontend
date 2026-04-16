@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
-import { LeftSidebar } from '../../partials/left-sidebar/left-sidebar';
 import { Footer } from '../../partials/footer/footer';
+import { Sidebar } from '../../partials/sidebar/sidebar';
 
 type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 
@@ -18,13 +18,13 @@ interface DashboardCard {
   imports: [
     ...SHARED_IMPORTS,
     Navbar,
-    LeftSidebar,
+    Sidebar,
     Footer,
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
-export class Dashboard implements OnInit {
+export class DashboardScreen implements OnInit {
   public drawerOpen = false;
   public userRole: UserRole = 'ADMINISTRADOR';
 

@@ -10,7 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
-
+import {MatRadioModule} from '@angular/material/radio';
 
 
 export const SHARED_IMPORTS = [
@@ -28,4 +28,6 @@ export const SHARED_IMPORTS = [
     MatDrawerContainer,
     MatDrawerContent,
     MatToolbarModule,
+    MatRadioModule
+
 ] as const;

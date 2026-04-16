@@ -1,5 +1,10 @@
 <!-- Navbar compartido para todas las pantallas -->
-<app-navbar (menuToggle)="toggleSidebar()"></app-navbar>
+<app-navbar 
+  (menuToggle)="toggleSidebar()" 
+  [isLogin]="isLogin"
+  [userRole]="userRole"
+  [mode]="mode">
+</app-navbar>
 
 <main id="contenido-principal">
 
@@ -7,7 +12,10 @@
     <!-- Sidebar -->
     <mat-drawer class="hero_drawer" mode="over" position="start" [opened]="isSidebarOpen"
                 (closedStart)="isSidebarOpen=false">
-      <app-sidebar [isLogin]="isLogin" (closeSidebar)="closeSidebar()"></app-sidebar> 
+      <app-sidebar 
+        [isLogin]="isLogin" 
+        [userRole]="userRole"
+        (closeSidebar)="closeSidebar()"></app-sidebar> 
     </mat-drawer>
 
     <!-- Contenido -->
@@ -191,8 +199,8 @@
 
     </div>
 
-          <div class="seccion-posts__cta fade-in">
-            <a class="btn btn--contorno" routerLink="/explorar">Ver todos los posts →</a>
+          <div class="seccion-posts__cta fade-in" routerLink="/posts">
+            <a class="btn btn--contorno">Ver todos los posts →</a>
           </div>
 
         </div>

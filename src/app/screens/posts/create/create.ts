@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
-import { LeftSidebar } from '../../../partials/left-sidebar/left-sidebar';
 import { Footer } from '../../../partials/footer/footer';
 import { PostsService } from '../../../services/posts-service';
 import { PostForm } from '../../../services/posts-service';
+import { Sidebar } from '../../../partials/sidebar/sidebar';
 
 type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 
@@ -20,7 +20,7 @@ interface CategoryItem {
   imports: [
     ...SHARED_IMPORTS,
     Navbar,
-    LeftSidebar,
+    Sidebar,
     Footer,
   ],
   templateUrl: './create.html',
