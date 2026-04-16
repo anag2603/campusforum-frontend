@@ -1,9 +1,8 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
 import { Footer } from "../../partials/footer/footer";
 import { Sidebar } from '../../partials/sidebar/sidebar';
-import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,16 +19,19 @@ import { CommonModule } from '@angular/common';
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
-export class Profile {
+export class ProfileScreen implements OnInit{
+
+  ngOnInit(): void {}
 
   isAvatarGalleryVisible: boolean = false;
 
   // Simulación de datos de usuario (dummy data)
   user = {
+    //TODO: Reemplazar con datos reales del usuario autenticado y añadir más campos según sea necesario
     first_name: 'Valeria Elizabeth',
     last_name: 'Rojo',
     email: 'valeria.rojo@uabc.edu.mx',
-    avatar: '../../../assets/images/avatares/avatar-original.png'
+    avatar: 'assets/images/avatares/avatar-original.png'
   }
 
   // Controla si la barra lateral (sidebar) está abierta
