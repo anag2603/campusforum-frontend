@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Router } from '@angular/router';
 import { UsuariosService } from '../../../services/usuarios-service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-registro-screen',
   imports: [
-    ...SHARED_IMPORTS
+    ...SHARED_IMPORTS,
+     RouterModule,
   ],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',

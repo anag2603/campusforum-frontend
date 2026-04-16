@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login-screen',
   standalone: true,
   imports: [
     ...SHARED_IMPORTS,
+    RouterModule,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
