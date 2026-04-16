@@ -9,11 +9,11 @@ export const routes: Routes = [
     },
     { 
         path: 'login', 
-        loadComponent: () => import('./screens/login/login').then(m => m.LoginScreen)
+        loadComponent: () => import('./screens/auth/login/login').then(m => m.LoginScreen)
     },
     {
       path: 'registro', 
-      loadComponent: () => import('./screens/registro/registro').then(m => m.RegistroScreen) 
+      loadComponent: () => import('./screens/auth/registro/registro').then(m => m.RegistroScreen) 
     }, //Ruteo
     { 
       path: 'profile', 
