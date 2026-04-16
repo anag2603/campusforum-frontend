@@ -1,5 +1,122 @@
-<!-- Navbar compartido para todas las pantallas -->
-<app-navbar></app-navbar>
-<p>profile works!</p>
-<!-- Footer compartido para todas las pantallas -->
-<app-footer></app-footer>
+<mat-drawer-container class="drawer-container">
+    <!-- Sidebar -->
+    <mat-drawer class="hero_drawer" mode="over" position="start" [opened]="isSidebarOpen"
+                (closedStart)="isSidebarOpen=false">
+      <app-sidebar [isLogin]="isLogin" (closeSidebar)="closeSidebar()"></app-sidebar> 
+    </mat-drawer>
+
+    <!-- Contenido -->
+    <mat-drawer-content>
+        <!-- Navbar compartido -->
+        <app-navbar (menuToggle)="toggleSidebar()"></app-navbar>
+        <section class="profile-container">
+
+            <!-- HEADER -->
+            <div class="profile-header">
+                <h1>Mi Perfil</h1>
+                <p>Gestiona tu información personal y tu actividad en CampusForum</p>
+            </div>
+
+            <div class="profile-content">
+
+                <!-- CARD IZQUIERDA (AVATAR + INFO GENERAL) -->
+                <div class="profile-card">
+
+                <!-- Avatar -->
+                <div class="avatar-section">
+                    <img [src]="user.avatar || '../../../assets/images/avatares/avatar-original.png'" alt="Avatar" class="avatar-img">
+                    <button class="btn-change-avatar" (click)="toggleAvatarGallery()">
+                        Cambiar avatar
+                    </button>
+                </div>
+
+                <!-- Rol -->
+                <div class="role-badge">
+                    <span>Estudiante</span>
+                </div>
+
+                </div>
+
+                <!-- INFORMACIÓN DEL USUARIO -->
+                <div class="profile-info">
+
+                <div class="info-group">
+                    <label>Nombre(s)</label>
+                    <p>{{ user.first_name }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Apellido paterno</label>
+                    <p>{{ user.last_name }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Apellido materno</label>
+                    <!--<p>{{ user.last_name }}</p>-->
+                </div>
+
+                <div class="info-group">
+                    <label>Correo institucional</label>
+                    <p>{{ user.email }}</p>
+                </div>
+
+                </div>
+
+            </div>
+
+            <!-- GALERÍA DE AVATARES -->
+            <div class="avatar-gallery">
+                @if (isAvatarGalleryVisible) {
+                    <h2>Selecciona un avatar</h2>
+                    <div class="avatar-gallery">
+                        <img src="../../../assets/images/avatares/avatar-gorra-lentes.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-gorra-lentes.png')">
+
+                        <img src="../../../assets/images/avatares/avatar-lentes.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-lentes.png')">
+
+                        <img src="../../../assets/images/avatares/avatar-mono.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-mono.png')">
+
+                        <img src="../../../assets/images/avatares/avatar-navidad-lentes.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/avatares/avatar-navidad-lentes.png')">
+
+                        <img src="../../../assets/images/avatares/avatar-original.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-original.png')">
+
+                        <img src="../../../assets/images/avatares/avatar-navidad.png" class="avatar-option" 
+                            (click)="selectAvatar('../../assets/images/avatares/avatar-navidad.png')">
+                    </div>
+                }
+            </div>
+
+            <!-- INSIGNIAS -->
+            <div class="badges-section">
+                <h2>Insignias</h2>
+                <div class="badges-grid">
+
+                <div class="badge">
+                    <i class="bi bi-star-fill"></i>
+                    <span>Top Participante</span>
+                </div>
+
+                <div class="badge">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span>Activo en foros</span>
+                </div>
+
+                <div class="badge">
+                    <i class="bi bi-award-fill"></i>
+                    <span>Contribuidor</span>
+                </div>
+                
+                </div>
+
+            </div>
+
+        </section>
+        <!-- Footer compartido para todas las pantallas -->
+        <app-footer></app-footer>
+    </mat-drawer-content>
+
+</mat-drawer-container>
