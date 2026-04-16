@@ -21,6 +21,8 @@ export interface RegistroUser {
   direccion: string;
   estado: string;
   terminos_condiciones: boolean;
+  rol: string;
+  last_name_mother: string;
 }
 
 export interface PerfilUsuarioUI {
@@ -72,7 +74,9 @@ export class UsuariosService {
       grado_estudios: '',
       direccion: '', 
       estado: '',
-      terminos_condiciones: false
+      terminos_condiciones: false,
+      last_name_mother: '', 
+      rol: '',
     };
   }
 
@@ -152,12 +156,23 @@ export class UsuariosService {
     if (!user.estado) {
       errors.estado = 'Por favor, selecciona un estado de la república.';
     }
-    // Importante: esta validación la pide su UI
+
     if (!user.terminos_condiciones) {
       errors.terminos_condiciones = 'Debe aceptar los términos y condiciones.';
     }
+
+   if (!user.last_name_mother?.trim()) {
+      errors.last_name_mother = 'El apellido materno es obligatorio.';
+    }
+
+    if (!user.rol) {
+      errors.rol = 'Seleccione un rol.';
+    }
     return errors;
+
   }
+
+
 
 
   /* =========================================================

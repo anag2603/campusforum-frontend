@@ -60,19 +60,33 @@
 }
 
 /* ROLES */
-.roles {
-  display: flex;
-  gap: 12px;
-  margin: 15px 0;
-}
 
 .rol-card {
   flex: 1;
   border: 2px solid #d3d9e3;
-  border-radius: 12px;
-  padding: 15px;
-  text-align: center;
+  border-radius: 14px;
+  padding: 16px;
   background: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* seleccionado */
+.rol-card:has(.mat-mdc-radio-checked) {
+  border-color: #6c84a3;
+  background: #eef3f8;
+}
+.roles {
+  display: flex;
+  gap: 16px;
+}
+
+.roles mat-radio-group {
+  display: flex;
+  width: 100%;
+  gap: 16px;
 }
 
 /* BOTÓN */
