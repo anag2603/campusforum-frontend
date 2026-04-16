@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SHARED_IMPORTS } from '../../shared/shared_imports';
+import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Router } from '@angular/router';
-import { UsuariosService } from '../../services/usuarios-service';
+import { UsuariosService } from '../../../services/usuarios-service';
 
 @Component({
   selector: 'app-registro-screen',
