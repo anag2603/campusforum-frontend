@@ -435,7 +435,7 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
   background: linear-gradient(160deg, #dde4ef 0%, var(--background-color) 50%, #e8f4dc 100%);
   overflow: hidden;
   padding: 72px 0 80px;
-  min-height: 100svh;
+  min-height: calc(100svh - 85px);
   display: flex;
   align-items: center;
 
@@ -755,7 +755,6 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
     color: var(--text-light);
     line-height: 1.65;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin: 0;
@@ -1240,5 +1239,38 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
     grid-template-columns: repeat(4, 1fr);
 
     .tarjeta-post--destacado { grid-column: span 2; }
+  }
+}
+
+.drawer-container {
+  height: 100vh;
+}
+
+.hero_drawer {
+  width: 280px; /* o el que uses */
+}
+.drawer-container {
+  display: contents;
+}
+
+main#contenido-principal {
+  overflow-x: hidden;
+}
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+main#contenido-principal {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    min-height: calc(100svh - 72px);
   }
 }

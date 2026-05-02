@@ -1,9 +1,24 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Input, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
-import { Footer } from "../../partials/footer/footer";
+import { Footer } from '../../partials/footer/footer';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { PostsService, PostListItem } from '../../services/posts-service';
+import { CategoriesService } from '../../services/categorias-service';
+import { CategoryItem } from '../../shared/interfaces/categories.interface';
+
+type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
+type NavbarMode = 'public' | 'private';
+
+interface LandingPost extends PostListItem {
+  categoriaTexto: string;
+  claseCat: string;
+  iniciales: string;
+  claseAvatar: string;
+  vistas: string;
+  destacado: boolean;
+}
 
 @Component({
   selector: 'app-landing',
@@ -13,85 +28,46 @@ import { CommonModule } from '@angular/common';
     Navbar,
     Footer,
     RouterLink,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
-export class Landing implements AfterViewInit {
+export class Landing implements OnInit, AfterViewInit {
+  @Input() userRole: UserRole = 'ESTUDIANTE';
+  @Input() mode: NavbarMode = 'public';
+  @Input() isLogin: boolean = false;
 
-  // Controla si el menú hamburguesa está abierto (móvil)
-  public menuAbierto = false;
+  public postsRecientes: LandingPost[] = [];
+  public categoriasAcademicas: CategoryItem[] = [];
 
-  // Arreglo con los posts que se pintarán en el HTML
-  public postsRecientes = [
-    {
-      id: 1,
-      categoria: '</> Programación',
-      claseCat: 'etiqueta-cat--prog',
-      fecha: '5 abr 2026',
-      titulo: '¿Cuál es el algoritmo de ordenamiento más eficiente para datos casi ordenados?',
-      extracto: 'Comparando Timsort vs Insertion Sort con benchmarks reales en Python y C++...',
-      iniciales: 'MR',
-      autor: 'Miguel Rodríguez',
-      claseAvatar: 'autor__avatar--azul',
-      comentarios: 42,
-      vistas: '218',
-      destacado: false
-    },
-    {
-      id: 2,
-      categoria: '✦ IA',
-      claseCat: 'etiqueta-cat--ia',
-      fecha: '4 abr 2026',
-      titulo: 'Introducción práctica a Redes Neuronales Convolucionales con PyTorch',
-      extracto: 'Guía paso a paso para construir tu primer clasificador de imágenes. Incluye dataset de la FCC...',
-      iniciales: 'LP',
-      autor: 'Dra. Laura Pérez',
-      claseAvatar: 'autor__avatar--verde',
-      comentarios: 97,
-      vistas: '1.4K',
-      destacado: true
-    },
-    {
-      id: 3,
-      categoria: '∑ Matemáticas',
-      claseCat: 'etiqueta-cat--mat',
-      fecha: '3 abr 2026',
-      titulo: 'Transformadas de Fourier: ¿por qué son fundamentales en procesamiento de señales?',
-      extracto: 'Explicación visual e intuitiva con ejemplos de audio y gráficas en Jupyter Notebook...',
-      iniciales: 'JT',
-      autor: 'Juan Torres',
-      claseAvatar: 'autor__avatar--ambar',
-      comentarios: 31,
-      vistas: '445',
-      destacado: false
-    },
-    {
-      id: 4,
-      categoria: '⚛ Física',
-      claseCat: 'etiqueta-cat--fis',
-      fecha: '2 abr 2026',
-      titulo: 'Mecánica cuántica para computólogos: el principio de superposición',
-      extracto: '¿Cómo se relaciona la superposición cuántica con los qubits? Una mirada desde la CS...',
-      iniciales: 'AG',
-      autor: 'Andrea Gutiérrez',
-      claseAvatar: 'autor__avatar--morado',
-      comentarios: 19,
-      vistas: '302',
-      destacado: true
-    }
-  ];
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly categoriesService: CategoriesService,
+  ) {}
 
-  public alternarMenu(): void {
-    this.menuAbierto = !this.menuAbierto;
+  ngOnInit(): void {
+    this.postsRecientes = this.postsService
+      .getRecentPublicPosts(4)
+      .map((post, index) => ({
+        ...post,
+        categoriaTexto: this.getCategoriaTexto(post.categoria),
+        claseCat: this.getClaseCategoria(post.categoria),
+        iniciales: this.getIniciales(post.autor),
+        claseAvatar: this.getClaseAvatar(index),
+        vistas: this.getVistasFake(index),
+        destacado: index === 1 || index === 3,
+      }));
+
+    this.categoriasAcademicas = this.categoriesService
+      .getAllCategories(false)
+      .slice(0, 4);
   }
 
-  // Activa animaciones fade-in cuando el elemento entra al viewport
   ngAfterViewInit(): void {
     const observador = new IntersectionObserver(
       (entradas) => {
-        entradas.forEach(entrada => {
+        entradas.forEach((entrada) => {
           if (entrada.isIntersecting) {
             entrada.target.classList.add('visible');
           }
@@ -100,7 +76,93 @@ export class Landing implements AfterViewInit {
       { threshold: 0.12 }
     );
 
-    document.querySelectorAll('.fade-in')
-      .forEach(el => observador.observe(el));
+    document.querySelectorAll('.fade-in').forEach((el) => observador.observe(el));
+  }
+
+  public getCategoriaTexto(nombre: string): string {
+    const key = nombre.toLowerCase();
+
+    if (key.includes('program')) {
+      return '</> Programación';
+    }
+
+    if (key.includes('inteligencia') || key.includes('ia')) {
+      return '✦ IA';
+    }
+
+    if (key.includes('mat')) {
+      return '∑ Matemáticas';
+    }
+
+    if (key.includes('base')) {
+      return '▦ Bases de Datos';
+    }
+
+    if (key.includes('red')) {
+      return '◎ Redes';
+    }
+
+    return nombre;
+  }
+
+  public getClaseCategoria(nombre: string): string {
+    const key = nombre.toLowerCase();
+
+    if (key.includes('program')) {
+      return 'etiqueta-cat--prog';
+    }
+
+    if (key.includes('inteligencia') || key.includes('ia')) {
+      return 'etiqueta-cat--ia';
+    }
+
+    if (key.includes('mat')) {
+      return 'etiqueta-cat--mat';
+    }
+
+    return 'etiqueta-cat--fis';
+  }
+
+  public getClaseCategoriaCard(nombre: string): string {
+    const key = nombre.toLowerCase();
+
+    if (key.includes('program')) {
+      return 'tarjeta-cat--prog';
+    }
+
+    if (key.includes('inteligencia') || key.includes('ia')) {
+      return 'tarjeta-cat--ia';
+    }
+
+    if (key.includes('mat')) {
+      return 'tarjeta-cat--mat';
+    }
+
+    return 'tarjeta-cat--fis';
+  }
+
+  public getIniciales(nombre: string): string {
+    return nombre
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((parte) => parte.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  public getClaseAvatar(index: number): string {
+    const clases = [
+      'autor__avatar--azul',
+      'autor__avatar--verde',
+      'autor__avatar--ambar',
+      'autor__avatar--morado',
+    ];
+
+    return clases[index % clases.length];
+  }
+
+  public getVistasFake(index: number): string {
+    const vistas = ['218', '1.4K', '445', '302'];
+    return vistas[index % vistas.length];
   }
 }

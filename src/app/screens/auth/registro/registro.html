@@ -1,1 +1,81 @@
-<p>registro works!</p>
+<section class="registro-container">
+
+  <div class="registro-card">
+
+    <div class="registro-icono"></div>
+
+    <h1 class="titulo">Registro de Usuario</h1>
+
+    <label class="label">Nombre *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.nombre" placeholder="Ej: Luis Yael" name="nombre">
+    </mat-form-field>
+    @if (errors.nombre) {
+      <div class="error">{{ errors.nombre }}</div>
+    }
+
+    <label class="label">Apellidos *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.apellidos" placeholder="Ej: Carro García" name="apellidos">
+    </mat-form-field>
+    @if (errors.apellidos) {
+      <div class="error">{{ errors.apellidos }}</div>
+    }
+
+    <label class="label">Correo Institucional *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.email" placeholder="ejemplo@institucion.edu.mx" name="email">
+    </mat-form-field>
+    @if (errors.email) {
+      <div class="error">{{ errors.email }}</div>
+    }
+
+    <label class="label">Contraseña *</label>
+    <mat-form-field appearance="outline" class="input-full">
+      <input matInput [(ngModel)]="user.password" [type]="inputType_1" placeholder="Mínimo 8 caracteres" name="password">
+      <mat-icon matSuffix (click)="showPassword()" style="cursor: pointer;">
+        {{ hide_1 ? 'visibility_off' : 'visibility' }}
+      </mat-icon>
+    </mat-form-field>
+    @if (errors.password) {
+      <div class="error">{{ errors.password }}</div>
+    }
+
+    <div class="roles">
+      <mat-radio-group [(ngModel)]="user.rol" class="roles-group" name="rol">
+
+        <div class="rol-card">
+          <mat-radio-button value="estudiante">Estudiante</mat-radio-button>
+        </div>
+
+        <div class="rol-card">
+          <mat-radio-button value="profesor">Profesor</mat-radio-button>
+        </div>
+
+      </mat-radio-group>
+    </div>
+
+    @if (errors.rol) {
+      <div class="error">{{ errors.rol }}</div>
+    }
+
+    <button class="btn-registro" (click)="registrar()">
+      Registrarse
+    </button>
+
+    <div class="bottom-link">
+      <span class="txt-registro">
+        ¿Ya tienes una cuenta?
+        <span class="red" (click)="goLogin()"> Inicia sesión</span>
+      </span>
+    </div>
+
+    <hr>
+
+    <a routerLink="/landing" class="home-link">
+      <i class="bi bi-house-door-fill"></i> Inicio
+    </a>
+
+  </div>
+
+</section>

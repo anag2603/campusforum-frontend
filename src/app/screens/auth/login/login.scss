@@ -2,27 +2,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; 
-  padding: 20px;    
+  min-height: 100vh;
+  padding: 20px;
   background: linear-gradient(to bottom, #dfe6ee, #cfd8e3);
 }
 
 .login-card-wrapper {
   position: relative;
-  width: 100%; 
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .login-card {
-  width: 100%;          
-  max-width: 380px;    
+  width: 100%;
+  max-width: 380px;
   padding: 2rem;
   border-radius: 20px;
   background: #f2f4f7;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-top: 80px;
+  margin-top: 60px;
 }
 
 .login-title {
@@ -71,7 +71,7 @@
 
 .mascota-login {
   position: absolute;
-  top: -95px;
+  top: -60px;
   left: 50%;
   transform: translateX(-50%);
   width: 110px;
@@ -84,15 +84,36 @@
   animation: float 3s ease-in-out infinite;
 }
 
+.back-home {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.home-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #4CAF50;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.home-link:hover {
+  color: #388e3c;
+  transform: scale(1.05);
+}
+
 @keyframes float {
   0% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
   100% { transform: translateY(0); }
 }
 
-.ojo {
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
+//UX PENDIENTE
 
 //Responsivo
 
@@ -100,7 +121,6 @@
 
   .login-card {
     padding: 1.5rem;
-    margin-top: 60px;
   }
 
   .login-title {
@@ -116,4 +136,11 @@
     top: -70px;
   }
 
+}
+
+@media (max-height: 700px) {
+  .mascota-login {
+    top: -40px;
+    width: 90px;
+  }
 }
