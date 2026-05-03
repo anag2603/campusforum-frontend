@@ -2,6 +2,7 @@
   <app-navbar
     mode="private"
     [userRole]="userRole"
+    [isLogin]="isLogin"
     (toggleSidebar)="toggleSidebar()"
   ></app-navbar>
 
@@ -15,6 +16,7 @@
     >
       <app-sidebar
         [userRole]="userRole"
+        [isLogin]="isLogin"
         (closeSidebar)="closeSidebar()"
       ></app-sidebar>
     </mat-drawer>
@@ -22,152 +24,216 @@
     <mat-drawer-content class="posts-detail__content">
       <div class="posts-detail__main">
         <main class="posts-detail__body">
+
           <section class="posts-detail__hero">
             <div class="posts-detail__hero-copy">
-              <h1 class="posts-detail__title">Detalle de publicación</h1>
-              <p class="posts-detail__subtitle">Consulta la información completa de la publicación</p>
+              <span class="posts-detail__eyebrow">Detalle de publicación</span>
+              <h1 class="posts-detail__title">
+                {{ post?.titulo || 'Publicación' }}
+              </h1>
+              <p class="posts-detail__subtitle">
+                Consulta el contenido completo y participa en la discusión mediante comentarios.
+              </p>
             </div>
 
             <button mat-stroked-button type="button" (click)="goBack()">
               <mat-icon>arrow_back</mat-icon>
-              Volver a publicaciones
+              Volver
             </button>
           </section>
 
           @if (post) {
-            <section class="posts-detail__card-section">
-              <mat-card class="posts-detail__card">
-                <mat-card-content>
-                  <div class="posts-detail__header">
-                    <div class="posts-detail__header-copy">
-                      <h2 class="posts-detail__card-title">{{ post.titulo }}</h2>
-                      <p class="posts-detail__card-subtitle">
-                        Información general de la publicación
+            <section class="posts-detail__layout">
+
+              <div class="posts-detail__primary">
+                <mat-card class="posts-detail__card">
+                  <mat-card-content>
+
+                    <div class="posts-detail__head">
+                      <div class="posts-detail__head-main">
+                        <div class="posts-detail__meta-top">
+                          <span class="posts-detail__category">{{ categoriaNombre }}</span>
+                          <span class="posts-detail__status" [ngClass]="getEstadoClase(post.estado)">
+                            {{ post.estado }}
+                          </span>
+                        </div>
+
+                        <div class="posts-detail__author-line">
+                          <span class="posts-detail__avatar">{{ post.autor.charAt(0) }}</span>
+
+                          <div class="posts-detail__author-copy">
+                            <strong>{{ post.autor }}</strong>
+                            <span>{{ post.fecha }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="posts-detail__head-actions">
+                        @if (canEditCurrentPost) {
+                          <button mat-stroked-button type="button" (click)="goEditPost()">
+                            <mat-icon>edit</mat-icon>
+                            Editar
+                          </button>
+
+                          <button mat-stroked-button type="button" (click)="eliminarPublicacion()">
+                            <mat-icon>delete</mat-icon>
+                            Eliminar
+                          </button>
+                        }
+
+                        @if (canReportContent) {
+                          <button mat-stroked-button type="button" (click)="reportarPublicacion()">
+                            <mat-icon>flag</mat-icon>
+                            Reportar
+                          </button>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="posts-detail__content-block">
+                      <p class="posts-detail__content-text">
+                        {{ post.contenido }}
                       </p>
                     </div>
 
-                    <span
-                      class="posts-detail__status"
-                      [class.published]="post.estado === 'PUBLICADO'"
-                      [class.draft]="post.estado === 'BORRADOR'"
-                      [class.archived]="post.estado === 'ARCHIVADO'"
-                    >
-                      {{ post.estado }}
-                    </span>
-                  </div>
-
-                  <div class="posts-detail__grid">
-                    <div class="posts-detail__item">
-                      <span class="posts-detail__label">Autor</span>
-                      <p class="posts-detail__value">{{ post.autor }}</p>
-                    </div>
-
-                    <div class="posts-detail__item">
-                      <span class="posts-detail__label">Fecha</span>
-                      <p class="posts-detail__value">{{ post.fecha }}</p>
-                    </div>
-
-                    <div class="posts-detail__item">
-                      <span class="posts-detail__label">Categoría</span>
-                      <p class="posts-detail__value">{{ categoriaNombre }}</p>
-                    </div>
-
-                    <div class="posts-detail__item">
-                      <span class="posts-detail__label">Etiquetas</span>
-                      <p class="posts-detail__value">{{ post.etiquetas || 'Sin etiquetas' }}</p>
-                    </div>
-                  </div>
-
-                  <div class="posts-detail__block">
-                    <span class="posts-detail__label">Contenido</span>
-                    <p class="posts-detail__text">
-                      {{ post.contenido }}
-                    </p>
-                  </div>
-
-                  <div class="posts-detail__actions">
-                    @if (canEditCurrentPost) {
-                      <button mat-stroked-button type="button" (click)="goEditPost()">
-                        <mat-icon>edit</mat-icon>
-                        Editar publicación
-                      </button>
+                    @if (getTags().length > 0) {
+                      <div class="posts-detail__tags">
+                        @for (tag of getTags(); track tag) {
+                          <span class="posts-detail__tag">#{{ tag }}</span>
+                        }
+                      </div>
                     }
 
-                    @if (canReportContent) {
-                      <button mat-stroked-button type="button" color="warn" (click)="reportarPublicacion()">
-                        <mat-icon>flag</mat-icon>
-                        Reportar publicación
-                      </button>
+                  </mat-card-content>
+                </mat-card>
+
+                <mat-card class="posts-detail__card">
+                  <mat-card-content>
+                    <div class="posts-detail__comment-form-head">
+                      <h2>Agregar comentario</h2>
+                      <p>Comparte tu opinión o aporta a la discusión.</p>
+                    </div>
+
+                    <mat-form-field appearance="outline" class="posts-detail__comment-field">
+                      <mat-label>Comentario</mat-label>
+                      <textarea
+                        matInput
+                        rows="5"
+                        [(ngModel)]="newComment"
+                        name="newComment"
+                        placeholder="Escribe tu comentario"
+                      ></textarea>
+                    </mat-form-field>
+
+                    @if (commentError) {
+                      <div class="posts-detail__error">{{ commentError }}</div>
                     }
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </section>
 
-            <section class="posts-detail__comments-section">
-              <mat-card class="posts-detail__card">
-                <mat-card-content>
-                  <div class="posts-detail__comments-header">
-                    <h3 class="posts-detail__comments-title">Comentarios</h3>
-                    <span class="posts-detail__comments-count">
-                      {{ post.comentarios.length }}
-                    </span>
-                  </div>
+                    <div class="posts-detail__comment-actions">
+                      <button mat-flat-button type="button" (click)="addComment()">
+                        <mat-icon>send</mat-icon>
+                        Publicar comentario
+                      </button>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
 
-                  @if (post.comentarios.length > 0) {
-                    <div class="posts-detail__comments-list">
-                      @for (comment of post.comentarios; track comment.id) {
-                        <div class="posts-detail__comment">
-                          <div class="posts-detail__comment-head">
-                            <div>
-                              <p class="posts-detail__comment-author">{{ comment.autor }}</p>
-                              <p class="posts-detail__comment-date">{{ comment.fecha }}</p>
+                <mat-card class="posts-detail__card">
+                  <mat-card-content>
+                    <div class="posts-detail__comments-head">
+                      <div>
+                        <h2>Comentarios</h2>
+                        <p>{{ post.comentarios.length }} comentario{{ post.comentarios.length === 1 ? '' : 's' }}</p>
+                      </div>
+                    </div>
+
+                    @if (post.comentarios.length > 0) {
+                      <div class="posts-detail__comments-list">
+                        @for (comment of post.comentarios; track comment.id) {
+                          <article class="posts-detail__comment-card">
+                            <div class="posts-detail__comment-top">
+                              <div class="posts-detail__comment-author">
+                                <span class="posts-detail__comment-avatar">
+                                  {{ comment.autor.charAt(0) }}
+                                </span>
+
+                                <div class="posts-detail__comment-author-copy">
+                                  <strong>{{ comment.autor }}</strong>
+                                  <span>{{ comment.fecha }}</span>
+                                </div>
+                              </div>
+
+                              <div class="posts-detail__comment-controls">
+                                @if (canDeleteComment(comment)) {
+                                  <button
+                                    mat-icon-button
+                                    type="button"
+                                    (click)="eliminarComentario(comment)"
+                                    aria-label="Eliminar comentario"
+                                  >
+                                    <mat-icon>delete</mat-icon>
+                                  </button>
+                                }
+
+                                @if (canReportContent) {
+                                  <button
+                                    mat-icon-button
+                                    type="button"
+                                    (click)="reportarComentario(comment)"
+                                    aria-label="Reportar comentario"
+                                  >
+                                    <mat-icon>flag</mat-icon>
+                                  </button>
+                                }
+                              </div>
                             </div>
 
-                            <div class="posts-detail__comment-actions">
-                              @if (canReportContent) {
-                                <button
-                                  mat-icon-button
-                                  type="button"
-                                  color="warn"
-                                  (click)="reportarComentario(comment)"
-                                  matTooltip="Reportar comentario"
-                                >
-                                  <mat-icon>flag</mat-icon>
-                                </button>
-                              }
+                            <p class="posts-detail__comment-text">
+                              {{ comment.contenido }}
+                            </p>
+                          </article>
+                        }
+                      </div>
+                    } @else {
+                      <div class="posts-detail__empty">
+                        Aún no hay comentarios en esta publicación.
+                      </div>
+                    }
+                  </mat-card-content>
+                </mat-card>
+              </div>
 
-                              @if (canDeleteComment(comment)) {
-                                <button
-                                  mat-icon-button
-                                  type="button"
-                                  color="warn"
-                                  (click)="eliminarComentario(comment)"
-                                  matTooltip="Eliminar comentario"
-                                >
-                                  <mat-icon>delete</mat-icon>
-                                </button>
-                              }
-                            </div>
-                          </div>
+              <aside class="posts-detail__aside">
+                <mat-card class="posts-detail__aside-card">
+                  <mat-card-content>
+                    <h3>Resumen</h3>
 
-                          <p class="posts-detail__comment-text">
-                            {{ comment.contenido }}
-                          </p>
-                        </div>
-                      }
+                    <div class="posts-detail__aside-item">
+                      <span class="posts-detail__aside-label">Autor</span>
+                      <strong>{{ post.autor }}</strong>
                     </div>
-                  }
 
-                  @if (post.comentarios.length === 0) {
-                    <div class="posts-detail__empty">
-                      Aún no hay comentarios para esta publicación.
+                    <div class="posts-detail__aside-item">
+                      <span class="posts-detail__aside-label">Categoría</span>
+                      <strong>{{ categoriaNombre }}</strong>
                     </div>
-                  }
-                </mat-card-content>
-              </mat-card>
+
+                    <div class="posts-detail__aside-item">
+                      <span class="posts-detail__aside-label">Estado</span>
+                      <strong>{{ post.estado }}</strong>
+                    </div>
+
+                    <div class="posts-detail__aside-item">
+                      <span class="posts-detail__aside-label">Comentarios</span>
+                      <strong>{{ post.comentarios.length }}</strong>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </aside>
+
             </section>
           }
+
         </main>
 
         <app-footer></app-footer>

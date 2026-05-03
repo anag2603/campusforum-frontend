@@ -1,66 +1,115 @@
 import { Routes } from '@angular/router';
 
+import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
+
+import { Landing } from './screens/landing/landing';
+import { Login } from './screens/auth/login/login';
+import { Registro } from './screens/auth/registro/registro';
+import { Dashboard } from './screens/dashboard/dashboard';
+import { Profile } from './screens/profile/profile';
+
+import { PostsList } from './screens/posts/list/list';
+import { PostsDetail } from './screens/posts/detail/detail';
+import { PostsForm } from './screens/posts/form/form';
+
+import { CategoriesList } from './screens/categories/list/list';
+import { CategoriesForm } from './screens/categories/form/form';
+
+import { ReportsList } from './screens/reports/list/list';
+
 export const routes: Routes = [
-    // Se renderiza con lazy loading para optimizar la carga inicial de la aplicación
-    { path: '', redirectTo: 'landing', pathMatch: 'full' },
-    {
-        path: 'landing',
-        loadComponent: () => import('./screens/landing/landing').then(m => m.Landing)
+  {
+    path: '',
+    redirectTo: 'landing',
+    pathMatch: 'full',
+  },
+
+  {
+    path: 'landing',
+    component: Landing,
+  },
+
+  {
+    path: 'login',
+    component: Login,
+  },
+
+  {
+    path: 'registro',
+    component: Registro,
+  },
+
+  {
+    path: 'dashboard',
+    component: Dashboard,
+    canActivate: [AuthGuard],
+  },
+
+  {
+    path: 'profile',
+    component: Profile,
+    canActivate: [AuthGuard],
+  },
+
+  /* POSTS */
+  {
+    path: 'posts',
+    component: PostsList,
+  },
+  {
+    path: 'posts/form',
+    component: PostsForm,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'posts/form/:id',
+    component: PostsForm,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'posts/:id',
+    component: PostsDetail,
+  },
+
+  /* CATEGORIES */
+  {
+    path: 'categories',
+    component: CategoriesList,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['PROFESOR', 'ADMINISTRADOR'],
     },
-    { 
-        path: 'login', 
-        loadComponent: () => import('./screens/auth/login/login').then(m => m.LoginScreen)
+  },
+  {
+    path: 'categories/create',
+    component: CategoriesForm,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['PROFESOR', 'ADMINISTRADOR'],
     },
-    {
-      path: 'registro', 
-      loadComponent: () => import('./screens/auth/registro/registro').then(m => m.RegistroScreen) 
-    }, //Ruteo
-    { 
-      path: 'profile', 
-      loadComponent: () => import('./screens/profile/profile').then(m => m.ProfileScreen) 
+  },
+  {
+    path: 'categories/:id/edit',
+    component: CategoriesForm,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['PROFESOR', 'ADMINISTRADOR'],
     },
-    {
-      path: 'dashboard',
-      loadComponent: () => import('./screens/dashboard/dashboard').then(m => m.DashboardScreen)
-    },
-    {
-      path: 'posts',
-      loadComponent: () => import('./screens/posts/list/list').then(m => m.PostsList)
-    },
-    {
-      path: 'posts/create',
-      loadComponent: () => import('./screens/posts/create/create').then(m => m.PostsCreate)
-    },
-    {
-      path: 'posts/:id',
-      loadComponent: () => import('./screens/posts/detail/detail').then(m => m.PostsDetail)
-    },
-    {
-      path: 'posts/:id/edit',
-      loadComponent: () => import('./screens/posts/edit/edit').then(m => m.PostsEdit)
-    },
-    {
-      path: 'categories',
-      loadComponent: () => import('./screens/categories/list/list').then(m => m.CategoriesList)
-    },
-    {
-      path: 'categories/form',
-      loadComponent: () => import('./screens/categories/form/form').then(m => m.CategoriesForm)
-    },
-    {
-      path: 'categories/:id/edit',
-      loadComponent: () => import('./screens/categories/edit/edit').then(m => m.CategoriesEdit)
-    },
-    {
+  },
+
+  /* REPORTS */
+  {
     path: 'reports',
-      loadComponent: () => import('./screens/reports/list/list').then(m => m.ReportsList)
+    component: ReportsList,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['PROFESOR', 'ADMINISTRADOR'],
     },
-    {
-      path: 'reports/create',
-      loadComponent: () => import('./screens/reports/create/create').then(m => m.ReportsCreate)
-    },
-    {
-      path: 'reports/:id',
-      loadComponent: () => import('./screens/reports/detail/detail').then(m => m.ReportsDetail)
-    },
+  },
+
+  {
+    path: '**',
+    redirectTo: 'landing',
+  },
 ];

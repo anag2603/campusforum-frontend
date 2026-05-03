@@ -1,127 +1,213 @@
-<mat-drawer-container class="drawer-container">
-    <!-- Sidebar -->
-    <mat-drawer class="hero_drawer" mode="over" position="start" [opened]="isSidebarOpen"
-                (closedStart)="isSidebarOpen=false">
-      <app-sidebar [isLogin]="isLogin" (closeSidebar)="closeSidebar()"></app-sidebar> 
+<section class="profile">
+  <app-navbar
+    mode="private"
+    [userRole]="userRole"
+    [isLogin]="isLogin"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-navbar>
+
+  <mat-drawer-container class="profile__drawer-container" autosize>
+    <mat-drawer
+      class="profile__drawer"
+      mode="over"
+      position="start"
+      [opened]="drawerOpen"
+      (closedStart)="drawerOpen = false"
+    >
+      <app-sidebar
+        [userRole]="userRole"
+        [isLogin]="isLogin"
+        (closeSidebar)="closeSidebar()"
+      ></app-sidebar>
     </mat-drawer>
 
-    <!-- Contenido -->
-    <mat-drawer-content>
-        <!-- Navbar compartido -->
-        <app-navbar (menuToggle)="toggleSidebar()"></app-navbar>
-        <section class="profile-container">
+    <mat-drawer-content class="profile__content">
+      <div class="profile__main">
+        <main class="profile__body">
 
-            <!-- HEADER -->
-            <div class="profile-header">
-                <h1>Mi Perfil</h1>
-                <p>Gestiona tu información personal y tu actividad en CampusForum</p>
+          <section class="profile__hero">
+            <div>
+              <span class="profile__eyebrow">Cuenta</span>
+              <h1 class="profile__title">Mi perfil</h1>
+              <p class="profile__subtitle">
+                Administra tus datos, avatar e insignias dentro de CampusForum.
+              </p>
             </div>
 
-            <div class="profile-content">
-
-                <!-- CARD IZQUIERDA (AVATAR + INFO GENERAL) -->
-                <div class="profile-card">
-
-                    <!-- Avatar -->
-                    <div class="avatar-section">
-                        <img [src]="user.avatar || '../../../assets/images/avatares/avatar-original.png'" alt="Avatar" class="avatar-img">
-                        <button class="btn-change-avatar" (click)="toggleAvatarGallery()">
-                            Cambiar avatar
-                        </button>
-                    </div>
-
-                    <!-- Rol -->
-                    <div class="role-badge">
-                        <span>Estudiante</span>
-                        
-                </div>
-
-                </div>
-
-                <!-- INFORMACIÓN DEL USUARIO -->
-                <div class="profile-info">
-
-                    <div class="info-group">
-                        <i class="bi bi-person"></i>
-                        <label>Nombre(s)</label>
-                        <p>{{ user.first_name }}</p>
-                    </div>
-
-                    <div class="info-group">
-                        <i class="bi bi-person"></i>
-                        <label>Apellido paterno</label>
-                        <p>{{ user.last_name }}</p>
-                    </div>
-
-                    <div class="info-group">
-                        <i class="bi bi-person"></i>
-                        <label>Apellido materno</label>
-                        <!--<p>{{ user.last_name }}</p>-->
-                    </div>
-
-                    <div class="info-group">
-                        <i class="bi bi-envelope"></i>
-                        <label>Correo institucional</label>
-                        <p>{{ user.email }}</p>
-                    </div>
-
-                </div>
-
+            <div class="profile__role-chip">
+              {{ userRole }}
             </div>
+          </section>
 
-            <!-- GALERÍA DE AVATARES -->
-            <div class="avatar-gallery">
-                @if (isAvatarGalleryVisible) {
-                    <h2>Selecciona un avatar</h2>
-                    <div class="avatar-gallery">
-                        <img src="../../../assets/images/avatares/avatar-gorra-lentes.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-gorra-lentes.png')">
+          <section class="profile__layout">
 
-                        <img src="../../../assets/images/avatares/avatar-lentes.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-lentes.png')">
+            <mat-card class="profile__card profile__card--preview">
+              <mat-card-content>
+                <div class="profile__avatar-preview">
+                  <img
+                    [src]="form.avatar || 'assets/avatares/avatar-original.png'"
+                    (error)="onAvatarError()"
+                    alt="Avatar del usuario"
+                  >
+                </div>
 
-                        <img src="../../../assets/images/avatares/avatar-mono.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-mono.png')">
+                <h2 class="profile__name">
+                  {{ form.firstName || 'Usuario' }} {{ form.lastName }}
+                </h2>
 
-                        <img src="../../../assets/images/avatares/avatar-navidad-lentes.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-navidad-lentes.png')">
+                <p class="profile__email">
+                  {{ form.email || 'correo@institucion.edu.mx' }}
+                </p>
 
-                        <img src="../../../assets/images/avatares/avatar-original.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-original.png')">
+                <div class="profile__badges">
+                  @if (userRole === 'ADMINISTRADOR') {
+                    <span class="profile__badge profile__badge--admin">
+                      <mat-icon>admin_panel_settings</mat-icon>
+                      Administrador
+                    </span>
+                  }
 
-                        <img src="../../../assets/images/avatares/avatar-navidad.png" class="avatar-option" 
-                            (click)="selectAvatar('../../assets/images/avatares/avatar-navidad.png')">
-                    </div>
+                  @if (userRole === 'PROFESOR') {
+                    <span class="profile__badge profile__badge--profesor">
+                      <mat-icon>school</mat-icon>
+                      Docente
+                    </span>
+                  }
+
+                  @if (userRole === 'ESTUDIANTE') {
+                    <span class="profile__badge profile__badge--estudiante">
+                      <mat-icon>menu_book</mat-icon>
+                      Alumno
+                    </span>
+                  }
+
+                  <span class="profile__badge profile__badge--activo">
+                    <mat-icon>verified</mat-icon>
+                    Usuario activo
+                  </span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="profile__card profile__card--form">
+              <mat-card-content>
+                <h2 class="profile__section-title">Datos personales</h2>
+
+                <div class="profile__grid">
+                  <div>
+                    <mat-form-field appearance="outline" class="full">
+                      <mat-label>Nombre/s</mat-label>
+                      <input
+                        matInput
+                        [(ngModel)]="form.firstName"
+                        name="firstName"
+                      >
+                    </mat-form-field>
+
+                    @if (errors.firstName) {
+                      <div class="error">{{ errors.firstName }}</div>
+                    }
+                  </div>
+
+                  <div>
+                    <mat-form-field appearance="outline" class="full">
+                      <mat-label>Apellido paterno</mat-label>
+                      <input
+                        matInput
+                        [(ngModel)]="form.lastName"
+                        name="lastName"
+                      >
+                    </mat-form-field>
+
+                    @if (errors.lastName) {
+                      <div class="error">{{ errors.lastName }}</div>
+                    }
+                  </div>
+
+                  <div>
+                    <mat-form-field appearance="outline" class="full">
+                      <mat-label>Apellido materno</mat-label>
+                      <input
+                        matInput
+                        [(ngModel)]="form.lastNameMother"
+                        name="lastNameMother"
+                      >
+                    </mat-form-field>
+
+                    @if (errors.lastNameMother) {
+                      <div class="error">{{ errors.lastNameMother }}</div>
+                    }
+                  </div>
+
+                  <div>
+                    <mat-form-field appearance="outline" class="full">
+                      <mat-label>Correo institucional</mat-label>
+                      <input
+                        matInput
+                        [(ngModel)]="form.email"
+                        name="email"
+                      >
+                    </mat-form-field>
+
+                    @if (errors.email) {
+                      <div class="error">{{ errors.email }}</div>
+                    }
+                  </div>
+
+                  <mat-form-field appearance="outline" class="full">
+                    <mat-label>Rol</mat-label>
+                    <input
+                      matInput
+                      [value]="form.role"
+                      disabled
+                    >
+                  </mat-form-field>
+                </div>
+
+                <h2 class="profile__section-title profile__section-title--avatar">
+                  Selecciona tu avatar
+                </h2>
+
+                <div class="profile__avatars">
+                  @for (avatar of avatars; track avatar) {
+                    <button
+                      type="button"
+                      class="profile__avatar-btn"
+                      [class.is-active]="form.avatar === avatar"
+                      (click)="selectAvatar(avatar)"
+                      aria-label="Seleccionar avatar"
+                    >
+                      <img [src]="avatar" alt="">
+                    </button>
+                  }
+                </div>
+
+                @if (successMessage) {
+                  <div class="profile__success">
+                    <mat-icon>check_circle</mat-icon>
+                    {{ successMessage }}
+                  </div>
                 }
-            </div>
 
-            <!-- INSIGNIAS -->
-            <div class="badges-section">
-                <h2>Insignias</h2>
-                <div class="badges-grid">
-
-                <div class="badge">
-                    <i class="bi bi-star-fill"></i>
-                    <span>Top Participante</span>
+                <div class="profile__actions">
+                  <button
+                    mat-flat-button
+                    color="primary"
+                    type="button"
+                    (click)="saveProfile()"
+                  >
+                    Guardar cambios
+                  </button>
                 </div>
+              </mat-card-content>
+            </mat-card>
 
-                <div class="badge">
-                    <i class="bi bi-chat-dots-fill"></i>
-                    <span>Activo en foros</span>
-                </div>
+          </section>
 
-                <div class="badge">
-                    <i class="bi bi-award-fill"></i>
-                    <span>Contribuidor</span>
-                </div>
-                
-                </div>
+        </main>
 
-            </div>
-
-        </section>
-        <!-- Footer compartido para todas las pantallas -->
         <app-footer></app-footer>
+      </div>
     </mat-drawer-content>
-
-</mat-drawer-container>
+  </mat-drawer-container>
+</section>

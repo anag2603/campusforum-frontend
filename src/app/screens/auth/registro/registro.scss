@@ -1,46 +1,42 @@
 .registro-container {
   display: flex;
   justify-content: center;
-  padding: 40px 20px;
-  background: #e9edf2;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(to bottom, #dfe6ee, #cfd8e3);
 }
 
 .registro-card {
   width: 100%;
   max-width: 520px;
-  background: #f7f9fc;
+  padding: 2rem;
   border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  background: #f2f4f7;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* ICONO * MASCOTA?
-.registro-icono {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  background: #9bd07c;
-  border: 10px solid #5e7694;
-}*/
-
+/* TITULO igual login */
 .titulo {
   text-align: center;
-  color: #5e7694;
-  font-size: 28px;
-  margin-bottom: 25px;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #1a2535;
 }
 
+/* LABELS igual login */
 .label {
   display: block;
-  margin-bottom: 5px;
-  color: #5e7694;
-  font-weight: 500;
+  margin-bottom: 6px;
+  color: #1a2535;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .input-full {
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 14px;
 }
 
 .row {
@@ -52,14 +48,37 @@
   flex: 1;
 }
 
+/* Inputs Angular Material */
+::ng-deep .registro-card .mat-mdc-input-element {
+  color: #1a2535 !important;
+}
+
+::ng-deep .registro-card .mdc-floating-label {
+  color: #6b7280 !important;
+}
+
 /* ERRORES */
-.error {
+.error,
+.invalid-feedback {
   color: #b32623;
-  font-size: 12px;
-  margin-bottom: 10px;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  text-align: left;
+  padding-left: 4px;
 }
 
 /* ROLES */
+.roles {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.roles-group {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
 
 .rol-card {
   flex: 1;
@@ -71,61 +90,76 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #1a2535;
+  font-weight: 600;
 }
 
-/* seleccionado */
 .rol-card:has(.mat-mdc-radio-checked) {
-  border-color: #6c84a3;
-  background: #eef3f8;
-}
-.roles {
-  display: flex;
-  gap: 16px;
+  border-color: #4caf50;
+  background: #eef8ef;
 }
 
-.roles mat-radio-group {
-  display: flex;
-  width: 100%;
-  gap: 16px;
+/* CHECKBOX */
+.example-margin {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 14px;
 }
 
-/* BOTÓN */
+.label-pwd {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.label-pwd:hover {
+  color: #388e3c;
+}
+
+/* BOTON igual login */
 .btn-registro {
   width: 100%;
   padding: 15px;
   border-radius: 12px;
-  background: #6c84a3;
+  background: #4caf50;
   color: white;
   border: none;
   font-size: 16px;
+  font-weight: 700;
   margin-top: 20px;
   margin-bottom: 15px;
+  transition: all 0.2s ease;
 }
 
-/* LINK */
-.login-link {
+.btn-registro:hover {
+  background: #388e3c;
+}
+
+/* LINKS */
+.bottom-link,
+.txt-registro {
   text-align: center;
-  margin-top: 20px;
-  color: #6c84a3;
-   margin-bottom: 15px;
+  margin-top: 15px;
+  color: #6b7280;
+  font-size: 14px;
 }
 
-.login-link span {
+.red,
+.link {
+  color: #4caf50;
   cursor: pointer;
-  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
+.red:hover,
+.link:hover {
+  color: #388e3c;
+}
+
+/* HOME */
 hr {
   margin: 20px 0;
   opacity: 0.3;
-}
-
-.back-home {
-  display: flex;
-  justify-content: center;
-  margin-top: 25px;
-  width: 100%;
-  margin-bottom: 10px;
 }
 
 .home-link {
@@ -133,13 +167,33 @@ hr {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #5e7694; 
+  color: #4caf50;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .home-link:hover {
-  color: #a9a9a9;
+  color: #388e3c;
   transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .registro-card {
+    padding: 1.5rem;
+  }
+
+  .titulo {
+    font-size: 1.5rem;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .roles-group {
+    flex-direction: column;
+  }
 }

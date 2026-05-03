@@ -1,55 +1,41 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { UserRole } from '../../models/auth-user.model';
 
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [
     ...SHARED_IMPORTS,
-    RouterLink,
-    RouterLinkActive
-],
+  ],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss',
+  styleUrl: './sidebar.scss'
 })
 export class Sidebar {
-
-  // Recibe el estado de visibilidad de la barra lateral (sidebar) desde el componente padre
-  @Input() isSidebarOpen: boolean = false;
-  @Input() isLogin: boolean = false;
   @Input() userRole: UserRole = 'ESTUDIANTE';
+  @Input() isLogin: boolean = false;
 
-  // Método para cerrar la barra lateral (sidebar)
   @Output() closeSidebar = new EventEmitter<void>();
 
-  private router = inject(Router);
+  constructor(
+    private readonly router: Router
+  ) {}
 
-  // Método para emitir el evento de cierre de la barra lateral (sidebar)
-  close() {
+  public goTo(route: string): void {
+    this.router.navigate([route]);
     this.closeSidebar.emit();
   }
 
-  // Método para navegar a una ruta específica y cerrar la barra lateral (sidebar)
-  goTo(route: string[]) {
-    this.router.navigate(route);
-    this.close();
+  public get canSeeCategories(): boolean {
+    return this.userRole === 'PROFESOR' || this.userRole === 'ADMINISTRADOR';
   }
 
-  //Simulación de cierre de sesión
-  logout() {
-    // Aquí puedes agregar la lógica para cerrar sesión, como limpiar tokens, redirigir a la página de inicio de sesión, etc.
-    console.log('Cerrando sesión...');
-    //TODO: Agregar auth.service.logout() para limpiar tokens, etc.
-    this.router.navigate(['/']);
-    this.close();
+  public get canSeeReports(): boolean {
+    return this.userRole === 'PROFESOR' || this.userRole === 'ADMINISTRADOR';
   }
 
-public get isProfesorOrAdmin(): boolean {
-  return (
-    this.userRole === 'PROFESOR' ||
-    this.userRole === 'ADMINISTRADOR'
-  );
-}
-
+  public get canSeeDashboard(): boolean {
+    return true;
+  }
 }

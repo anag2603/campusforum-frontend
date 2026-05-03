@@ -1,21 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
-import { Footer } from '../../../partials/footer/footer';
 import { Sidebar } from '../../../partials/sidebar/sidebar';
-
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
-type ReportStatus = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
-
-interface ReportItem {
-  id: number;
-  motivo: string;
-  descripcion: string;
-  usuario: string;
-  fecha: string;
-  estado: ReportStatus;
-}
+import { Footer } from '../../../partials/footer/footer';
+import { AuthService } from '../../../services/auth.service';
+import {
+  ReportsService,
+  ReportItem,
+} from '../../../services/reports-service';
+import { UserRole } from '../../../models/auth-user.model';
+import { ModerationActionModal } from '../../../modals/moderation-action-modal/moderation-action-modal';
 
 @Component({
   selector: 'app-reports-list',
@@ -30,48 +25,21 @@ interface ReportItem {
   styleUrls: ['./list.scss'],
 })
 export class ReportsList implements OnInit {
-  public drawerOpen = false;
-  public userRole: UserRole = 'ADMINISTRADOR';
+  public drawerOpen: boolean = false;
+  public isLogin: boolean = false;
+  public userRole: UserRole = 'ESTUDIANTE';
+  public reports: ReportItem[] = [];
 
-  public reports: ReportItem[] = [
-    {
-      id: 1,
-      motivo: 'Contenido inapropiado',
-      descripcion: 'El post contiene lenguaje ofensivo',
-      usuario: 'Juan Pérez',
-      fecha: '2026-03-25',
-      estado: 'PENDIENTE',
-    },
-    {
-      id: 2,
-      motivo: 'Spam',
-      descripcion: 'Publicación repetida varias veces',
-      usuario: 'Ana López',
-      fecha: '2026-03-24',
-      estado: 'APROBADO',
-    },
-    {
-      id: 3,
-      motivo: 'Información falsa',
-      descripcion: 'Contenido incorrecto académicamente',
-      usuario: 'Carlos Ruiz',
-      fecha: '2026-03-23',
-      estado: 'RECHAZADO',
-    },
-  ];
-
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly reportsService: ReportsService,
+    private readonly dialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
-    const savedRole = localStorage.getItem('userRole') as UserRole | null;
-
-    if (
-      savedRole === 'ESTUDIANTE' ||
-      savedRole === 'PROFESOR' ||
-      savedRole === 'ADMINISTRADOR'
-    ) {
-      this.userRole = savedRole;
-    }
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+    this.loadReports();
   }
 
   public toggleSidebar(): void {
@@ -82,22 +50,40 @@ export class ReportsList implements OnInit {
     this.drawerOpen = false;
   }
 
-  public goToProfile(): void {
-    this.router.navigate(['/profile']);
+  public resolverReporte(report: ReportItem): void {
+    const ref = this.dialog.open(ModerationActionModal, {
+      width: '560px',
+      data: {
+        targetType: report.tipo,
+        contenidoResumen: this.getContenidoResumen(report),
+        autorContenido: this.getAutorContenido(report),
+        motivo: report.motivo,
+      },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+
+      this.reportsService.updateStatus(report.id, result.decision);
+      this.loadReports();
+    });
   }
 
-  public cambiarEstado(report: ReportItem, estado: ReportStatus): void {
-    report.estado = estado;
+  private loadReports(): void {
+    this.reports = this.reportsService.getAllReports();
   }
 
-public verDetalle(reportId: number): void {
-  this.router.navigate(['/reports', reportId]);
-}
+  private getContenidoResumen(report: ReportItem): string {
+    if (report.descripcion?.trim()) {
+      return report.descripcion;
+    }
 
-  public get canManageReports(): boolean {
-    return (
-      this.userRole === 'PROFESOR' ||
-      this.userRole === 'ADMINISTRADOR'
-    );
+    return `Reporte sobre ${report.tipo === 'POST' ? 'publicación' : 'comentario'} #${report.referenciaId}`;
+  }
+
+  private getAutorContenido(report: ReportItem): string {
+    return report.reportadoPor || 'Usuario';
   }
 }

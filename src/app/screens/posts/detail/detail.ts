@@ -1,36 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
 import { Footer } from '../../../partials/footer/footer';
-import { Sidebar } from "../../../partials/sidebar/sidebar";
-
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
-type PostStatus = 'PUBLICADO' | 'BORRADOR' | 'ARCHIVADO';
-
-interface CategoryItem {
-  id: number;
-  nombre: string;
-}
-
-interface CommentItem {
-  id: number;
-  autor: string;
-  contenido: string;
-  fecha: string;
-}
-
-interface PostItem {
-  id: number;
-  titulo: string;
-  contenido: string;
-  categoriaId: number;
-  etiquetas: string;
-  estado: PostStatus;
-  autor: string;
-  fecha: string;
-  comentarios: CommentItem[];
-}
+import { Sidebar } from '../../../partials/sidebar/sidebar';
+import { AuthService } from '../../../services/auth.service';
+import {
+  CategoryItem,
+  CommentItem,
+  PostDetailItem,
+  PostsService,
+} from '../../../services/posts-service';
+import { ReportsService } from '../../../services/reports-service';
+import { UserRole } from '../../../models/auth-user.model';
+import { ConfirmDeletePostModal } from '../../../modals/confirm-delete-post-modal/confirm-delete-post-modal';
+import { ConfirmDeleteCommentModal } from '../../../modals/confirm-delete-comment-modal/confirm-delete-comment-modal';
+import { ReportPostModal } from '../../../modals/report-post-modal/report-post-modal';
+import { ReportCommentModal } from '../../../modals/report-comment-modal/report-comment-modal';
 
 @Component({
   selector: 'app-posts-detail',
@@ -39,140 +26,42 @@ interface PostItem {
     ...SHARED_IMPORTS,
     Navbar,
     Sidebar,
-    Footer,
-    Sidebar
-],
+    Footer
+  ],
   templateUrl: './detail.html',
   styleUrls: ['./detail.scss'],
 })
 export class PostsDetail implements OnInit {
-  public drawerOpen = false;
-  public userRole: UserRole = 'ADMINISTRADOR';
+  public drawerOpen: boolean = false;
+  public isLogin: boolean = false;
+  public userRole: UserRole = 'ESTUDIANTE';
   public currentUserName: string = '';
 
   public postId: number = 0;
-  public post: PostItem | null = null;
+  public post: PostDetailItem | null = null;
   public categoriaNombre: string = '';
+  public newComment: string = '';
+  public commentError: string = '';
 
-  public categories: CategoryItem[] = [
-    { id: 1, nombre: 'Programación' },
-    { id: 2, nombre: 'Matemáticas' },
-    { id: 3, nombre: 'Inteligencia Artificial' },
-    { id: 4, nombre: 'Bases de Datos' },
-    { id: 5, nombre: 'Redes' },
-  ];
-
-  public posts: PostItem[] = [
-    {
-      id: 1,
-      titulo: '¿Cómo empezar con Angular?',
-      contenido:
-        'Quiero conocer una ruta clara para comenzar a trabajar con Angular desde cero. Me interesa saber qué temas debo estudiar primero, cómo organizar mi aprendizaje y qué recomendaciones prácticas podrían ayudarme a construir proyectos reales desde las bases hasta temas más avanzados.',
-      categoriaId: 1,
-      etiquetas: 'angular, frontend, rutas',
-      estado: 'PUBLICADO',
-      autor: 'Ana López',
-      fecha: '22/03/2026',
-      comentarios: [
-        {
-          id: 1,
-          autor: 'Carlos Pérez',
-          contenido: 'Te recomiendo empezar por componentes, rutas y servicios antes de pasar a estado global.',
-          fecha: '23/03/2026',
-        },
-        {
-          id: 2,
-          autor: 'María Torres',
-          contenido: 'Haz proyectos pequeños primero, como un CRUD o una app de tareas.',
-          fecha: '23/03/2026',
-        },
-      ],
-    },
-    {
-      id: 2,
-      titulo: 'Dudas sobre normalización en bases de datos',
-      contenido:
-        'Tengo dudas con primera, segunda y tercera forma normal para un proyecto escolar. Quisiera entender cómo identificar dependencias, cuándo dividir tablas y qué errores suelen cometerse al momento de diseñar el esquema relacional en etapas iniciales.',
-      categoriaId: 4,
-      etiquetas: 'sql, bases de datos, normalización',
-      estado: 'BORRADOR',
-      autor: 'Carlos Pérez',
-      fecha: '21/03/2026',
-      comentarios: [
-        {
-          id: 1,
-          autor: 'Luis Ramírez',
-          contenido: 'Lo primero es detectar dependencias parciales y transitivas para decidir cuándo separar tablas.',
-          fecha: '22/03/2026',
-        },
-      ],
-    },
-    {
-      id: 3,
-      titulo: 'Recursos para aprender redes',
-      contenido:
-        'Compartan libros, videos o prácticas para entender mejor subnetting, VLANs y configuración básica de switches en laboratorio. También me servirían simuladores o rutas de estudio recomendadas para reforzar la parte práctica.',
-      categoriaId: 5,
-      etiquetas: 'redes, subnetting, vlan',
-      estado: 'PUBLICADO',
-      autor: 'María Torres',
-      fecha: '20/03/2026',
-      comentarios: [],
-    },
-    {
-      id: 4,
-      titulo: 'Aplicaciones de IA en educación',
-      contenido:
-        'Me interesa debatir cómo se puede usar la inteligencia artificial en contextos académicos, qué ventajas puede traer y qué riesgos existen en términos de dependencia tecnológica, evaluación automática o pérdida de criterio crítico.',
-      categoriaId: 3,
-      etiquetas: 'ia, educación, tecnología',
-      estado: 'ARCHIVADO',
-      autor: 'Luis Ramírez',
-      fecha: '19/03/2026',
-      comentarios: [
-        {
-          id: 1,
-          autor: 'Ana López',
-          contenido: 'Puede ser útil si se usa como apoyo, pero no debería reemplazar el análisis del estudiante.',
-          fecha: '20/03/2026',
-        },
-      ],
-    },
-  ];
+  public categories: CategoryItem[] = [];
 
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
+    private readonly dialog: MatDialog,
+    private readonly postsService: PostsService,
+    private readonly reportsService: ReportsService,
   ) {}
 
   ngOnInit(): void {
-    const savedRole = localStorage.getItem('userRole') as UserRole | null;
-    const savedUserName = localStorage.getItem('userName');
-
-    if (
-      savedRole === 'ESTUDIANTE' ||
-      savedRole === 'PROFESOR' ||
-      savedRole === 'ADMINISTRADOR'
-    ) {
-      this.userRole = savedRole;
-    }
-
-    this.currentUserName = savedUserName ? savedUserName.trim() : '';
+    this.syncAuthState();
+    this.categories = this.postsService.getCategories();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     this.postId = Number(idParam ?? 0);
 
-    const foundPost = this.posts.find((item) => item.id === this.postId);
-
-    if (!foundPost) {
-      this.router.navigate(['/posts']);
-      return;
-    }
-
-    this.post = foundPost;
-
-    const foundCategory = this.categories.find((item) => item.id === foundPost.categoriaId);
-    this.categoriaNombre = foundCategory ? foundCategory.nombre : 'Sin categoría';
+    this.loadPost();
   }
 
   public toggleSidebar(): void {
@@ -181,10 +70,6 @@ export class PostsDetail implements OnInit {
 
   public closeSidebar(): void {
     this.drawerOpen = false;
-  }
-
-  public goToProfile(): void {
-    this.router.navigate(['/profile']);
   }
 
   public goBack(): void {
@@ -196,34 +81,87 @@ export class PostsDetail implements OnInit {
       return;
     }
 
-    this.router.navigate(['/posts', this.postId, 'edit']);
+    this.router.navigate(['/posts/form', this.postId]);
   }
 
-  public reportarPublicacion(): void {
-    if (!this.post) {
+  public addComment(): void {
+    this.commentError = '';
+
+    const result = this.postsService.addComment(
+      this.postId,
+      this.newComment,
+      this.currentUserName || 'Usuario'
+    );
+
+    if (!result.ok) {
+      this.commentError = result.error ?? 'No se pudo agregar el comentario.';
       return;
     }
 
-    this.router.navigate(['/reports/create'], {
-      queryParams: {
-        type: 'post',
-        referenciaId: this.post.id,
-        postId: this.post.id,
+    this.newComment = '';
+    this.loadPost();
+  }
+
+  public reportarPublicacion(): void {
+    if (!this.post || !this.canReportContent) {
+      return;
+    }
+
+    const ref = this.dialog.open(ReportPostModal, {
+      width: '520px',
+      data: {
+        titulo: this.post.titulo,
       },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result || !this.post) {
+        return;
+      }
+
+this.reportsService.createReport(
+  {
+    tipo: 'POST',
+    referenciaId: this.post.id,
+    postId: this.post.id,
+    motivo: result.motivo,
+    descripcion: this.post.titulo,
+    estado: 'PENDIENTE',
+  },
+  this.currentUserName || 'Usuario'
+);
     });
   }
 
   public reportarComentario(comment: CommentItem): void {
-    if (!this.post) {
+    if (!this.post || !this.canReportContent) {
       return;
     }
 
-    this.router.navigate(['/reports/create'], {
-      queryParams: {
-        type: 'comment',
-        referenciaId: comment.id,
-        postId: this.post.id,
+    const ref = this.dialog.open(ReportCommentModal, {
+      width: '520px',
+      data: {
+        autor: comment.autor,
+        contenido: comment.contenido,
       },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result || !this.post) {
+        return;
+      }
+
+this.reportsService.createReport(
+  {
+    tipo: 'COMENTARIO',
+    referenciaId: comment.id,
+    postId: this.post.id,
+    motivo: result.motivo,
+    descripcion: comment.contenido,
+    estado: 'PENDIENTE',
+  },
+  this.currentUserName || 'Usuario'
+);
     });
   }
 
@@ -232,10 +170,67 @@ export class PostsDetail implements OnInit {
       return;
     }
 
-    this.post.comentarios = this.post.comentarios.filter((item) => item.id !== comment.id);
+    const ref = this.dialog.open(ConfirmDeleteCommentModal, {
+      width: '500px',
+      data: {
+        autor: comment.autor,
+        contenido: comment.contenido,
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.postsService.deleteComment(this.postId, comment.id);
+        this.loadPost();
+      }
+    });
   }
 
-  public isOwner(post: PostItem): boolean {
+  public eliminarPublicacion(): void {
+    if (!this.post || !this.canEditCurrentPost) {
+      return;
+    }
+
+    const ref = this.dialog.open(ConfirmDeletePostModal, {
+      width: '500px',
+      data: {
+        titulo: this.post.titulo,
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.postsService.deletePost(this.postId);
+        this.router.navigate(['/posts']);
+      }
+    });
+  }
+
+  public getEstadoClase(estado: string): string {
+    switch (estado) {
+      case 'PUBLICADO':
+        return 'posts-detail__status--published';
+      case 'BORRADOR':
+        return 'posts-detail__status--draft';
+      case 'ARCHIVADO':
+        return 'posts-detail__status--archived';
+      default:
+        return '';
+    }
+  }
+
+  public getTags(): string[] {
+    if (!this.post?.etiquetas.trim()) {
+      return [];
+    }
+
+    return this.post.etiquetas
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  public isOwner(post: PostDetailItem): boolean {
     if (!this.currentUserName.trim()) {
       return false;
     }
@@ -268,6 +263,26 @@ export class PostsDetail implements OnInit {
   }
 
   public get canReportContent(): boolean {
-    return true;
+    return this.isLogin;
+  }
+
+  private syncAuthState(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+    this.currentUserName = this.authService.getUserName();
+  }
+
+  private loadPost(): void {
+    const foundPost = this.postsService.getPostById(this.postId);
+
+    if (!foundPost) {
+      this.router.navigate(['/posts']);
+      return;
+    }
+
+    this.post = foundPost;
+
+    const foundCategory = this.categories.find((item) => item.id === foundPost.categoriaId);
+    this.categoriaNombre = foundCategory ? foundCategory.nombre : 'Sin categoría';
   }
 }

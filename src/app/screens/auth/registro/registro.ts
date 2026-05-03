@@ -1,120 +1,144 @@
-import { Component, OnInit } from '@angular/core';
-import { SHARED_IMPORTS } from '../../../shared/shared_imports';
-import { Router } from '@angular/router';
-import { UsuariosService } from '../../../services/usuarios-service';
-import { RouterModule } from '@angular/router';
+import { Component } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
+import { AuthService } from '../../../services/auth.service';
+import { UserRole } from '../../../models/auth-user.model';
+
+type RegisterRole = 'ESTUDIANTE' | 'PROFESOR';
 
 @Component({
-  selector: 'app-registro-screen',
+  selector: 'app-registro',
+  standalone: true,
   imports: [
-    ...SHARED_IMPORTS,
-     RouterModule,
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatRadioModule,
   ],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
 })
-export class RegistroScreen implements OnInit {
+export class Registro {
+  public user = {
+    nombre: '',
+    apellidos: '',
+    email: '',
+    password: '',
+    rol: '' as '' | 'estudiante' | 'profesor',
+  };
 
-  /* =========================
-     Estado
-     ========================= */
-  public user: any = {};
-  public errors: any = {};
-  public isLoading = false;
+  public errors = {
+    nombre: '',
+    apellidos: '',
+    email: '',
+    password: '',
+    rol: '',
+    general: '',
+  };
 
-  /* Password */
-  public hide_1 = true;
+  public hide_1: boolean = true;
   public inputType_1: 'password' | 'text' = 'password';
-
-  /* Edades */
-  public edades: Array<{ value: number }> = [];
-
-  
-    /* ID */
-  public validarID(event: any): void {
-  const input = event.target as HTMLInputElement;
-  const limpio = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-  
-  // Actualizamos el modelo y el valor del input visualmente
-  this.user.id_usuario = limpio;
-  input.value = limpio;
-}
 
   constructor(
     private readonly router: Router,
-    private usuariosService: UsuariosService
+    private readonly authService: AuthService,
   ) {}
-
-  ngOnInit(): void {
-    // Initialization logic here
-    //Vincular el esquema de usuario del servicio para inicializar el objeto user con las propiedades necesarias para el formulario de registro.
-    // Esto asegura que el objeto user tenga la estructura correcta y facilita la validación posterior.
-    this.user = this.usuariosService.esquemaUser();
-
-    // Se inia el array de edades para el select del formulario de registro.
-    this.llenarArrayEdades();
-  }
-
-  private llenarArrayEdades(): void {
-    // Igual a su lógica original (18..80)
-    this.edades = Array.from({ length: 63 }, (_, i) => ({ value: i + 18 }));
-  }
-
-  public terminosCondiciones(): void {
-    // Aquí puede abrir modal / navegar / etc.
-    alert('Aquí se mostrarán los Términos y Condiciones.');
-  }
-
-  public registrar(): void {
-    // Lógica de registro aquí
-    if (this.isLoading) return;
-
-    // 1) Validación centralizada en UsuariosService
-    this.errors = this.usuariosService.validarUsuario(this.user);
-
-    // 2) Sin jQuery: si hay errores, se detiene
-    if (Object.keys(this.errors).length > 0) return;
-
-    // 3) Registro
-    this.isLoading = true;
-
-    //TODO: Aquí se llamaría al método de registro del servicio, pasando el objeto user.
-    //TODO: Luego, se manejaría la respuesta (éxito o error) para mostrar mensajes al usuario o navegar a otra pantalla.
-
-  }
-
-  public goLogin(): void {
-    this.router.navigate(['']); // ajuste según su app
-  }
 
   public showPassword(): void {
     this.hide_1 = !this.hide_1;
     this.inputType_1 = this.hide_1 ? 'password' : 'text';
   }
-  public hide_2 = true;
-  public inputType_2: 'password' | 'text' = 'password';
 
-    /* PASS2 */
-public showPassword2(): void {
-  this.hide_2 = !this.hide_2;
-  this.inputType_2 = this.hide_2 ? 'password' : 'text';
-}
-  /* CURP */
-public validarCURP(event: any): void {
-  const input = event.target as HTMLInputElement;
-  // Borra espacios/caracteres raros, pasa a MAYÚSCULAS y corta a 18 letras
-  const limpio = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 18);
-  this.user.curp = limpio;
-  input.value = limpio;
-}
-  /* RFC */
-public validarRFC(event: any): void {
-  const input = event.target as HTMLInputElement;
-  // Limpia, pasa a mayúsculas y corta a 13
-  const limpio = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 13);
-  this.user.rfc = limpio;
-  input.value = limpio;
-}
+  public registrar(): void {
+    this.clearErrors();
 
+    if (!this.validateForm()) {
+      return;
+    }
 
+    const role: RegisterRole = this.user.rol === 'profesor' ? 'PROFESOR' : 'ESTUDIANTE';
+
+    const registerResult = this.authService.register({
+      nombre: `${this.user.nombre.trim()} ${this.user.apellidos.trim()}`.trim(),
+      email: this.user.email.trim(),
+      password: this.user.password.trim(),
+      role,
+    });
+
+    if (!registerResult.ok) {
+      this.errors.general = registerResult.error;
+      return;
+    }
+
+    this.router.navigate(['/login']);
+  }
+
+  public goLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  private validateForm(): boolean {
+    let isValid = true;
+
+    const nombre = this.user.nombre.trim();
+    const apellidos = this.user.apellidos.trim();
+    const email = this.user.email.trim();
+    const password = this.user.password.trim();
+
+    if (!nombre) {
+      this.errors.nombre = 'El nombre es obligatorio.';
+      isValid = false;
+    }
+
+    if (!apellidos) {
+      this.errors.apellidos = 'Los apellidos son obligatorios.';
+      isValid = false;
+    }
+
+    if (!email) {
+      this.errors.email = 'El correo institucional es obligatorio.';
+      isValid = false;
+    } else if (!this.isValidEmail(email)) {
+      this.errors.email = 'Ingresa un correo válido.';
+      isValid = false;
+    }
+
+    if (!password) {
+      this.errors.password = 'La contraseña es obligatoria.';
+      isValid = false;
+    } else if (password.length < 8) {
+      this.errors.password = 'La contraseña debe tener al menos 8 caracteres.';
+      isValid = false;
+    }
+
+    if (!this.user.rol) {
+      this.errors.rol = 'Selecciona un rol.';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  private clearErrors(): void {
+    this.errors = {
+      nombre: '',
+      apellidos: '',
+      email: '',
+      password: '',
+      rol: '',
+      general: '',
+    };
+  }
+
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 }
