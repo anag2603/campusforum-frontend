@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  url_api: 'https://TU_DOMINIO_PRODUCCION.appspot.com'
 };

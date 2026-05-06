@@ -26,6 +26,7 @@ export class Login {
   public password: string = '';
 
   public focusedField: '' | 'email' | 'password' = '';
+  public isLoading: boolean = false;
 
   public hide_1: boolean = true;
   public inputType_1: 'password' | 'text' = 'password';
@@ -58,17 +59,18 @@ export class Login {
       return;
     }
 
-    const authResult = this.authService.authenticate(this.username, this.password);
+    this.isLoading = true;
+    this.authService.authenticate(this.username, this.password).subscribe((authResult) => {
+      this.isLoading = false;
 
-    if (!authResult.ok) {
-      this.errors.credentials = authResult.error;
-      return;
-    }
+      if (!authResult.ok) {
+        this.errors.credentials = authResult.error;
+        return;
+      }
 
-    this.authService.login(authResult.user);
-
-    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    this.router.navigateByUrl(redirectTo || '/dashboard');
+      const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+      this.router.navigateByUrl(redirectTo || '/dashboard');
+    });
   }
 
   public goRegistro(): void {

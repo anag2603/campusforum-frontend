@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { AuthUser, UserRole } from '../models/auth-user.model';
+import { environment } from '../../environments/environment';
 
-interface RegisteredUserRecord {
+interface LoginResponse {
   id: number;
-  nombre: string;
-  firstName: string;
-  lastName: string;
-  lastNameMother: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  password: string;
-  role: UserRole;
-  avatar: string | null;
+  token: string;
+  roles: string[];
+}
+
+interface StoredSession {
+  user: AuthUser;
+  token: string;
 }
 
 interface ProfileUpdateInput {
@@ -22,6 +27,8 @@ interface ProfileUpdateInput {
   avatar: string;
 }
 
+const SESSION_KEY = 'campusforum_session';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -30,114 +37,90 @@ export class AuthService {
   public readonly currentUser$: Observable<AuthUser | null> =
     this.currentUserSubject.asObservable();
 
-private readonly registeredUsers: RegisteredUserRecord[] = [
-  {
-    id: 1,
-    nombre: 'Juan López',
-    firstName: 'Juan',
-    lastName: 'López',
-    lastNameMother: 'García',
-    email: 'juan@correo.com',
-    password: '12345678',
-    role: 'ESTUDIANTE',
-    avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
-  },
-  {
-    id: 2,
-    nombre: 'Profesor Demo',
-    firstName: 'Profesor',
-    lastName: 'Demo',
-    lastNameMother: 'Campus',
-    email: 'profesor@correo.com',
-    password: '12345678',
-    role: 'PROFESOR',
-    avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
-  },
-  {
-    id: 3,
-    nombre: 'Admin Demo',
-    firstName: 'Admin',
-    lastName: 'Demo',
-    lastNameMother: 'Campus',
-    email: 'admin@correo.com',
-    password: '12345678',
-    role: 'ADMINISTRADOR',
-    avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
-  },
-];
+  constructor(private readonly http: HttpClient) {
+    this.restoreSession();
+  }
 
-  public register(input: {
-    nombre: string;
-    email: string;
-    password: string;
-    role: UserRole;
-    lastName?: string;
-    lastNameMother?: string;
-  }): { ok: true; user: AuthUser } | { ok: false; error: string } {
-    const normalizedEmail = input.email.trim().toLowerCase();
-
-    const existingUser = this.registeredUsers.find(
-      (user) => user.email.toLowerCase() === normalizedEmail
-    );
-
-    if (existingUser) {
-      return {
-        ok: false,
-        error: 'Ese correo ya está registrado.',
-      };
+  private restoreSession(): void {
+    const stored = localStorage.getItem(SESSION_KEY);
+    if (stored) {
+      try {
+        const session: StoredSession = JSON.parse(stored);
+        this.currentUserSubject.next(session.user);
+      } catch {
+        localStorage.removeItem(SESSION_KEY);
+      }
     }
+  }
 
-    const parsedName = this.parseFullName(input.nombre);
-
-    const firstName = parsedName.firstName;
-    const lastName = input.lastName?.trim() || parsedName.lastName;
-    const lastNameMother =
-      input.lastNameMother?.trim() || parsedName.lastNameMother;
-
-    const newUser: RegisteredUserRecord = {
-      id: Date.now(),
-      nombre: this.buildFullName(firstName, lastName, lastNameMother),
-      firstName,
-      lastName,
-      lastNameMother,
-      email: normalizedEmail,
-      password: input.password,
-      role: input.role,
-      avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
-    };
-
-    this.registeredUsers.push(newUser);
-
-    return {
-      ok: true,
-      user: this.toAuthUser(newUser),
-    };
+  public getToken(): string | null {
+    const stored = localStorage.getItem(SESSION_KEY);
+    if (!stored) return null;
+    try {
+      return (JSON.parse(stored) as StoredSession).token;
+    } catch {
+      return null;
+    }
   }
 
   public authenticate(
     email: string,
     password: string
-  ): { ok: true; user: AuthUser } | { ok: false; error: string } {
-    const normalizedEmail = email.trim().toLowerCase();
-    const normalizedPassword = password.trim();
+  ): Observable<{ ok: true; user: AuthUser } | { ok: false; error: string }> {
+    return this.http
+      .post<LoginResponse>(`${environment.url_api}/token/`, {
+        username: email.trim().toLowerCase(),
+        password,
+      })
+      .pipe(
+        map((response) => {
+          const user: AuthUser = {
+            id: response.id,
+            nombre: `${response.first_name} ${response.last_name}`.trim(),
+            email: response.email,
+            role: this.mapRole(response.roles),
+            avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
+          };
+          const session: StoredSession = { user, token: response.token };
+          localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+          this.currentUserSubject.next(user);
+          return { ok: true as const, user };
+        }),
+        catchError((err: HttpErrorResponse) => {
+          const error =
+            err.status === 400
+              ? 'Correo o contraseña incorrectos.'
+              : 'Error de conexión. Intenta más tarde.';
+          return of({ ok: false as const, error });
+        })
+      );
+  }
 
-    const foundUser = this.registeredUsers.find(
-      (user) =>
-        user.email.toLowerCase() === normalizedEmail &&
-        user.password === normalizedPassword
-    );
-
-    if (!foundUser) {
-      return {
-        ok: false,
-        error: 'Correo o contraseña incorrectos.',
-      };
-    }
-
-    return {
-      ok: true,
-      user: this.toAuthUser(foundUser),
-    };
+  public register(input: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    role: string;
+  }): Observable<{ ok: true } | { ok: false; error: string }> {
+    return this.http
+      .post(`${environment.url_api}/users/`, {
+        first_name: input.first_name,
+        last_name: input.last_name,
+        email: input.email.trim().toLowerCase(),
+        password: input.password,
+        role: input.role,
+      })
+      .pipe(
+        map(() => ({ ok: true as const })),
+        catchError((err: HttpErrorResponse) => {
+          const error =
+            err.status === 400
+              ? 'Ese correo ya está registrado.'
+              : 'Error al registrar. Intenta más tarde.';
+          return of({ ok: false as const, error });
+        })
+      );
   }
 
   public login(user: AuthUser): void {
@@ -145,6 +128,13 @@ private readonly registeredUsers: RegisteredUserRecord[] = [
   }
 
   public logout(): void {
+    const token = this.getToken();
+    if (token) {
+      this.http.get(`${environment.url_api}/logout/`).subscribe({
+        error: () => {},
+      });
+    }
+    localStorage.removeItem(SESSION_KEY);
     this.currentUserSubject.next(null);
   }
 
@@ -165,91 +155,63 @@ private readonly registeredUsers: RegisteredUserRecord[] = [
   }
 
   public getUserFirstName(): string {
-    const user = this.getCurrentUserRecord();
-    return user?.firstName ?? this.getUserName();
+    const nombre = this.getUserName();
+    return nombre.split(' ')[0] ?? nombre;
   }
 
   public getUserLastName(): string {
-    return this.getCurrentUserRecord()?.lastName ?? '';
+    const parts = this.getUserName().split(' ');
+    return parts[1] ?? '';
   }
 
   public getUserLastNameMother(): string {
-    return this.getCurrentUserRecord()?.lastNameMother ?? '';
+    const parts = this.getUserName().split(' ');
+    return parts.slice(2).join(' ');
   }
 
   public getUserEmail(): string {
     return this.getCurrentUser()?.email ?? '';
   }
 
-public getUserAvatar(): string {
-  return this.getCurrentUser()?.avatar ?? 'assets/images/avatares/avatar-gorra-lentes.png';
-}
+  public getUserAvatar(): string {
+    return (
+      this.getCurrentUser()?.avatar ??
+      'assets/images/avatares/avatar-gorra-lentes.png'
+    );
+  }
 
-  public updateProfile(input: ProfileUpdateInput): { ok: true } | { ok: false; error: string } {
+  public updateProfile(
+    input: ProfileUpdateInput
+  ): { ok: true } | { ok: false; error: string } {
     const currentUser = this.getCurrentUser();
 
     if (!currentUser) {
-      return {
-        ok: false,
-        error: 'No hay usuario autenticado.',
-      };
+      return { ok: false, error: 'No hay usuario autenticado.' };
     }
 
-    const normalizedEmail = input.email.trim().toLowerCase();
-
-    const duplicatedEmail = this.registeredUsers.find(
-      (user) =>
-        user.email.toLowerCase() === normalizedEmail &&
-        user.id !== currentUser.id
-    );
-
-    if (duplicatedEmail) {
-      return {
-        ok: false,
-        error: 'Ese correo ya está registrado por otro usuario.',
-      };
-    }
-
-    const index = this.registeredUsers.findIndex(
-      (user) => user.id === currentUser.id
-    );
-
-    if (index === -1) {
-      return {
-        ok: false,
-        error: 'Usuario no encontrado.',
-      };
-    }
-
-    const updatedRecord: RegisteredUserRecord = {
-      ...this.registeredUsers[index],
-      firstName: input.firstName.trim(),
-      lastName: input.lastName.trim(),
-      lastNameMother: input.lastNameMother.trim(),
-      nombre: this.buildFullName(
-        input.firstName.trim(),
-        input.lastName.trim(),
-        input.lastNameMother.trim()
-      ),
-      email: normalizedEmail,
+    const updatedUser: AuthUser = {
+      ...currentUser,
+      nombre: [input.firstName, input.lastName, input.lastNameMother]
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .join(' '),
+      email: input.email.trim().toLowerCase(),
       avatar: input.avatar,
     };
 
-    this.registeredUsers[index] = updatedRecord;
-    this.currentUserSubject.next(this.toAuthUser(updatedRecord));
-
-    return {
-      ok: true,
+    const session: StoredSession = {
+      user: updatedUser,
+      token: this.getToken() ?? '',
     };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    this.currentUserSubject.next(updatedUser);
+
+    return { ok: true };
   }
 
   public hasRole(roles: UserRole[]): boolean {
     const role = this.getUserRole();
-
-    if (!role) {
-      return false;
-    }
-
+    if (!role) return false;
     return roles.includes(role);
   }
 
@@ -265,50 +227,9 @@ public getUserAvatar(): string {
     return this.getUserRole() === 'ESTUDIANTE';
   }
 
-  private getCurrentUserRecord(): RegisteredUserRecord | null {
-    const currentUser = this.getCurrentUser();
-
-    if (!currentUser) {
-      return null;
-    }
-
-    return (
-      this.registeredUsers.find((user) => user.id === currentUser.id) ?? null
-    );
-  }
-
-  private toAuthUser(user: RegisteredUserRecord): AuthUser {
-    return {
-      id: user.id,
-      nombre: user.nombre,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    };
-  }
-
-  private parseFullName(nombre: string): {
-    firstName: string;
-    lastName: string;
-    lastNameMother: string;
-  } {
-    const parts = nombre.trim().split(/\s+/).filter(Boolean);
-
-    return {
-      firstName: parts[0] ?? '',
-      lastName: parts[1] ?? '',
-      lastNameMother: parts.slice(2).join(' '),
-    };
-  }
-
-  private buildFullName(
-    firstName: string,
-    lastName: string,
-    lastNameMother: string
-  ): string {
-    return [firstName, lastName, lastNameMother]
-      .map((part) => part.trim())
-      .filter(Boolean)
-      .join(' ');
+  private mapRole(roles: string[]): UserRole {
+    if (roles.includes('administrador')) return 'ADMINISTRADOR';
+    if (roles.includes('profesor')) return 'PROFESOR';
+    return 'ESTUDIANTE';
   }
 }
