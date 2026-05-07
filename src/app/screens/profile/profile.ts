@@ -4,6 +4,7 @@ import { Navbar } from '../../partials/navbar/navbar';
 import { Footer } from "../../partials/footer/footer";
 import { Sidebar } from '../../partials/sidebar/sidebar';
 import { CommonModule } from '@angular/common';
+import { S } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-profile',
@@ -30,6 +31,7 @@ export class ProfileScreen implements OnInit{
     //TODO: Reemplazar con datos reales del usuario autenticado y añadir más campos según sea necesario
     first_name: 'Valeria Elizabeth',
     last_name: 'Rojo',
+    secondary_last_name: 'Hernández',  
     email: 'valeria.rojo@uabc.edu.mx',
     avatar: 'assets/images/avatares/avatar-original.png'
   }
