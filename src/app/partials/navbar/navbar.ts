@@ -1,78 +1,72 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { SHARED_IMPORTS } from '../../shared/shared_imports'; 
-import { Router, RouterLink } from '@angular/router';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { SHARED_IMPORTS } from '../../shared/shared_imports';
+import { AuthService } from '../../services/auth.service';
+import { UserRole } from '../../models/auth-user.model';
 
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 type NavbarMode = 'public' | 'private';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
-    RouterLink, //Ruteo
     ...SHARED_IMPORTS,
+    RouterModule
   ],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.scss',
+  styleUrls: ['./navbar.scss'],
 })
 export class Navbar {
-
-  private router = inject(Router);
-
-  // Notificación al componente padre para alternar la barra lateral (sidebar)
-  @Output() menuToggle = new EventEmitter<void>();
-  @Output() toggleSidebar = new EventEmitter<void>();
-
   @Input() mode: NavbarMode = 'public';
   @Input() userRole: UserRole = 'ESTUDIANTE';
   @Input() isLogin: boolean = false;
 
-  // Método para emitir el evento de alternar la barra lateral (sidebar)
-  onMenuSidebar() {
-    this.menuToggle.emit();
+  @Output() toggleSidebar = new EventEmitter<void>();
+
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+  ) {}
+
+  public onToggleSidebar(): void {
     this.toggleSidebar.emit();
   }
 
-  goToInicio() {
-    this.router.navigate(['/']);
-  }
-
-  goToLogin() {
+  public logout(): void {
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  goToRegistro() {
+  public goToInicio(): void {
+    if (this.mode === 'private') {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    this.router.navigate(['/landing']);
+  }
+
+  public goToRegistro(): void {
     this.router.navigate(['/registro']);
   }
 
-  goToProfile() {
+  public goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  public goToProposito(): void {
+    this.router.navigate(['/landing'], { fragment: 'proposito' });
+  }
+
+  public goToProfile(): void {
     this.router.navigate(['/profile']);
   }
 
-  goToProposito() {
-    this.router.navigate(['/'], { fragment: 'proposito' });
-  }
-
-  get isPublic(): boolean {
+  public get isPublic(): boolean {
     return this.mode === 'public';
   }
 
-  get isPrivate(): boolean {
+  public get isPrivate(): boolean {
     return this.mode === 'private';
   }
-
-  get isProfesorOrAdmin(): boolean {
-    return (
-      this.userRole === 'PROFESOR' ||
-      this.userRole === 'ADMINISTRADOR'
-    );
-  }
-
-  logout() {
-    console.log('Cerrando sesión...');
-    //TODO: Agregar auth.service.logout() para limpiar tokens, etc.
-    this.router.navigate(['/']);
-    this.menuToggle.emit();
-  }
-
 }

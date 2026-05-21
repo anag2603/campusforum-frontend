@@ -1,63 +1,102 @@
-<mat-toolbar color="primary" class="navbar px-2 px-md-4">
+<mat-toolbar color="primary" class="navbar px-4">
+  <section class="brand-container" aria-label="Barra principal">
+    @if (isPrivate) {
+      <button
+        mat-icon-button
+        type="button"
+        class="menu-btn"
+        (click)="onToggleSidebar()"
+        aria-label="Abrir menú"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+    }
 
-  <!-- IZQUIERDA -->
-  <div class="nav-left d-flex align-items-center">
-    <button mat-icon-button class="d-md-none hamburguer-button" (click)="onMenuSidebar()">
-      <i class="bi bi-list"></i>
-    </button>
-  </div>
-
-  <!-- CENTRO -->
-  <div class="nav-center">
-    <section class="brand-container" (click)="goToInicio()">
-      <a class="brand-logo-link">
-        <img src="assets/images/logo-blanco.png" class="brand-logo" />
+    @if (isPublic) {
+      <a
+        type="button"
+        (click)="goToInicio()"
+        class="brand-logo-link"
+        aria-label="Ir a inicio"
+      >
+        <img
+          src="assets/images/logo-blanco.png"
+          alt="Logo CampusForum"
+          class="brand-logo"
+        />
       </a>
-      <a class="brand-text" (click)="goToInicio()">
-        <span class="brand-campus">CAMPUS</span>
-        <span class="brand-forum">FORUM</span>
-      </a>
+    }
+
+    <a
+      [routerLink]="isPrivate ? '/dashboard' : '/landing'"
+      class="brand-text"
+    >
+      <span class="brand-campus">CAMPUS</span>
+      <span class="brand-forum">FORUM</span>
+    </a>
+  </section>
+
+  @if (isPublic) {
+    <section class="navbar__links">
+      <a mat-button type="button" (click)="goToInicio()">Inicio</a>
+
+      <button
+        mat-button
+        type="button"
+        (click)="goToProposito()"
+        class="nav-link-btn"
+      >
+        Propósito
+      </button>
     </section>
-  </div>
+  }
 
-  <!-- DERECHA -->
-  <div class="nav-right d-flex align-items-center gap-3">
+  @if (isPublic) {
+    <section class="navbar__actions navbar__actions--public">
+      <button
+        mat-button
+        type="button"
+        (click)="goToLogin()"
+        class="login-btn"
+      >
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+      </button>
 
-    <section class="d-none d-md-flex gap-4">
-      <a mat-button routerLink="/">Inicio</a>
-      <a mat-button routerLink="/proposito">Propósito</a>
+      <button
+        mat-raised-button
+        type="button"
+        (click)="goToRegistro()"
+        class="register-btn"
+      >
+        <i class="bi bi-person-plus"></i>
+        <span>Registro</span>
+      </button>
     </section>
+  }
 
-    <!-- Desktop -->
-    <section class="d-none d-md-flex align-items-center gap-2">
-      @if (isPublic && !isLogin) {
-        <button mat-button routerLink="/login" class="login-btn">
-          Login
-        </button>
+  @if (isPrivate) {
+    <section class="navbar__actions navbar__actions--private">
+      <button
+        mat-button
+        type="button"
+        class="navbar-profile-btn"
+        (click)="goToProfile()"
+      >
+      <mat-icon>person_outlined</mat-icon>
+        Perfil
+      </button>
 
-        <button mat-raised-button routerLink="/registro" class="register-btn">
-          Registro
-        </button>
-      }
-
-      @if (isPrivate && isLogin) {
-        <button mat-button routerLink="/profile" class="profile-btn">
-          Perfil
-        </button>
-
-        @if (isProfesorOrAdmin) { 
-          <button mat-button routerLink="/dashboard" class="dashboard-btn">
-            Dashboard
-          </button>
-        }
-
-        <button mat-button (click)="logout()" class="logout-btn">
-          Cerrar sesión
-        </button>
-      }
-
+      <button
+        mat-stroked-button
+        type="button"
+        class="logout-btn"
+        (click)="logout()"
+        aria-label="Cerrar sesión"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        <span class="logout-btn__text">Cerrar sesión</span>
+      </button>
     </section>
-
-  </div>
-
+  }
 </mat-toolbar>

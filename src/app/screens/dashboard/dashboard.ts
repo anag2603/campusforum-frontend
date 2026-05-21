@@ -2,15 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
-import { Footer } from '../../partials/footer/footer';
 import { Sidebar } from '../../partials/sidebar/sidebar';
-
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
-
-interface DashboardCard {
-  title: string;
-  value: string;
-}
+import { Footer } from '../../partials/footer/footer';
+import { AuthService } from '../../services/auth.service';
+import { PostsService } from '../../services/posts-service';
+import { CategoriesService } from '../../services/categorias-service';
+import { ReportsService } from '../../services/reports-service';
+import { UserRole } from '../../models/auth-user.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,40 +22,33 @@ interface DashboardCard {
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
-export class DashboardScreen implements OnInit {
-  public drawerOpen = false;
-  public userRole: UserRole = 'ADMINISTRADOR';
+export class Dashboard implements OnInit {
+  public drawerOpen: boolean = false;
+  public isLogin: boolean = false;
+  public userRole: UserRole = 'ESTUDIANTE';
+  public currentUserName: string = '';
 
-  public tendenciasCards: DashboardCard[] = [
-    { title: 'Categoría más comentada', value: 'Programación' },
-    { title: 'Segunda tendencia', value: 'Matemáticas' },
-    { title: 'Tercera tendencia', value: 'Inteligencia Artificial' },
-  ];
+  public totalPosts: number = 0;
+  public totalPublishedPosts: number = 0;
+  public totalCategories: number = 0;
+  public totalComments: number = 0;
+  public pendingReports: number = 0;
 
-  public publicacionesPorCategoria: DashboardCard[] = [
-    { title: 'Programación', value: '24 publicaciones' },
-    { title: 'Matemáticas', value: '16 publicaciones' },
-    { title: 'Redes', value: '9 publicaciones' },
-  ];
+  public postsByCategory: { categoria: string; total: number }[] = [];
+  public topPosters: { autor: string; total: number }[] = [];
+  public trendingCategories: { categoria: string; totalComentarios: number }[] = [];
 
-  public topPosters: DashboardCard[] = [
-    { title: 'Ana López', value: '18 aportes' },
-    { title: 'Carlos Pérez', value: '15 aportes' },
-    { title: 'María Torres', value: '12 aportes' },
-  ];
-
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly postsService: PostsService,
+    private readonly categoriesService: CategoriesService,
+    private readonly reportsService: ReportsService,
+  ) {}
 
   ngOnInit(): void {
-    const savedRole = localStorage.getItem('userRole') as UserRole | null;
-
-    if (
-      savedRole === 'ESTUDIANTE' ||
-      savedRole === 'PROFESOR' ||
-      savedRole === 'ADMINISTRADOR'
-    ) {
-      this.userRole = savedRole;
-    }
+    this.syncAuthState();
+    this.loadDashboardData();
   }
 
   public toggleSidebar(): void {
@@ -68,37 +59,37 @@ export class DashboardScreen implements OnInit {
     this.drawerOpen = false;
   }
 
-  public goToPosts(): void {
+  public goPosts(): void {
     this.router.navigate(['/posts']);
   }
 
-  public goToCategories(): void {
+  public goCategories(): void {
     this.router.navigate(['/categories']);
   }
 
-  public goToReports(): void {
+  public goReports(): void {
     this.router.navigate(['/reports']);
   }
 
-  public get isEstudiante(): boolean {
-    return this.userRole === 'ESTUDIANTE';
-  }
-
-  public get isProfesor(): boolean {
-    return this.userRole === 'PROFESOR';
-  }
-
-  public get isAdministrador(): boolean {
-    return this.userRole === 'ADMINISTRADOR';
-  }
-
-  public get isProfesorOrAdmin(): boolean {
+  public get isModerator(): boolean {
     return this.userRole === 'PROFESOR' || this.userRole === 'ADMINISTRADOR';
   }
 
-public get canManagePost(): boolean {
-  return this.userRole === 'ADMINISTRADOR'
-    || this.userRole === 'PROFESOR';
-}
+  private syncAuthState(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+    this.currentUserName = this.authService.getUserName();
+  }
 
+  private loadDashboardData(): void {
+    this.totalPosts = this.postsService.getTotalPosts();
+    this.totalPublishedPosts = this.postsService.getTotalPublishedPosts();
+    this.totalCategories = this.categoriesService.getAllCategories(false).length;
+    this.totalComments = this.postsService.getTotalComments();
+    this.pendingReports = this.reportsService.getPendingReportsCount();
+
+    this.postsByCategory = this.postsService.getPostsByCategory();
+    this.topPosters = this.postsService.getTopPosters();
+    this.trendingCategories = this.postsService.getTrendingCategories();
+  }
 }

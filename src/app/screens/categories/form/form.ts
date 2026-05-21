@@ -1,62 +1,68 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
-import { Footer } from '../../../partials/footer/footer';
-import { CategoriasService } from '../../../services/categorias-service';
-import { CategoriaForm } from '../../../services/categorias-service';
 import { Sidebar } from '../../../partials/sidebar/sidebar';
+import { Footer } from '../../../partials/footer/footer';
+import { AuthService } from '../../../services/auth.service';
+import {CategoriesService} from '../../../services/categorias-service';
+import { CategoryErrors, CategoryForm } from '../../../shared/interfaces/categories.interface';
+import { UserRole } from '../../../models/auth-user.model';
 
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
 
 @Component({
   selector: 'app-categories-form',
   standalone: true,
-  imports: [
-    ...SHARED_IMPORTS,
-    Navbar,
-    Sidebar,
-    Footer,
-  ],
+  imports: [...SHARED_IMPORTS, Navbar, Sidebar, Footer],
   templateUrl: './form.html',
   styleUrls: ['./form.scss'],
 })
 export class CategoriesForm implements OnInit {
   public drawerOpen = false;
-  public userRole: UserRole = 'ADMINISTRADOR';
+  public isLogin = false;
+  public userRole: UserRole = 'ESTUDIANTE';
 
-  public nombre: string = '';
-  public estado: string = 'ACTIVA';
+  public isEditMode = false;
+  public categoryId: number | null = null;
 
-  public errors: any = {};
+  public form: CategoryForm;
+  public errors: CategoryErrors = {};
 
   constructor(
     private readonly router: Router,
-    private readonly categoriasService: CategoriasService
-  ) {}
-
-ngOnInit(): void {
-  const savedRole = localStorage.getItem('userRole') as UserRole | null;
-
-  if (
-    savedRole === 'ESTUDIANTE' ||
-    savedRole === 'PROFESOR' ||
-    savedRole === 'ADMINISTRADOR'
+    private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
+    private readonly categoriesService: CategoriesService,
   ) {
-    this.userRole = savedRole;
+    this.form = this.categoriesService.esquemaCategoria();
   }
 
-  if (!this.canManageCategories) {
-    this.router.navigate(['/categories']);
-    return;
+  ngOnInit(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      return;
+    }
+
+    this.isEditMode = true;
+    this.categoryId = Number(idParam);
+
+    const found = this.categoriesService.getCategoryById(this.categoryId);
+    if (!found) {
+      this.router.navigate(['/categories']);
+      return;
+    }
+
+    this.form = {
+      id: found.id,
+      nombre: found.nombre,
+      descripcion: found.descripcion,
+      estado: found.estado,
+    };
   }
 
-  this.cargarEsquemaCategoria();
-}
-
-  /* =========================
-     UI
-     ========================= */
   public toggleSidebar(): void {
     this.drawerOpen = !this.drawerOpen;
   }
@@ -65,71 +71,29 @@ ngOnInit(): void {
     this.drawerOpen = false;
   }
 
-  public goToProfile(): void {
-    this.router.navigate(['/profile']);
-  }
-
   public goBack(): void {
     this.router.navigate(['/categories']);
   }
 
-  public onlyAlphanumeric(event: KeyboardEvent): void {
-    const regex = /^[a-zA-Z0-9 ]$/;
-    if (!regex.test(event.key) && event.key !== 'Backspace') {
-      event.preventDefault();
-    }
-  }
-  /* =========================
-     Acciones
-     ========================= */
-  public guardarCategoria(): void {
-    this.submit();
-  }
+  public save(): void {
+    this.errors = {};
 
-  public submit(): void {
-    const categoria = this.obtenerCategoriaDesdeFormulario();
-
-    this.errors = this.categoriasService.validarCategoria(categoria);
-
-    if (Object.keys(this.errors).length > 0) {
+    if (this.isEditMode && this.categoryId) {
+      const result = this.categoriesService.updateCategory(this.categoryId, this.form);
+      if (!result.ok) {
+        this.errors = result.errors;
+        return;
+      }
+      this.router.navigate(['/categories']);
       return;
     }
 
-    const payload = {
-      nombre: categoria.nombre.trim(),
-      estado: categoria.estado,
-    };
+    const result = this.categoriesService.createCategory(this.form);
+    if (!result.ok) {
+      this.errors = result.errors;
+      return;
+    }
 
-    console.log('Categoría a enviar al backend después:', payload);
-
-    localStorage.setItem('lastCategoryDraft', JSON.stringify(payload));
     this.router.navigate(['/categories']);
-  }
-
-  /* =========================
-     Helpers
-     ========================= */
-  private cargarEsquemaCategoria(): void {
-    const esquema = this.categoriasService.esquemaCategoria();
-
-    this.nombre = esquema.nombre;
-    this.estado = esquema.estado;
-  }
-
-  private obtenerCategoriaDesdeFormulario(): CategoriaForm {
-    return {
-      nombre: this.nombre,
-      estado: this.estado,
-    };
-  }
-
-  /* =========================
-     Permisos
-     ========================= */
-  public get canManageCategories(): boolean {
-    return (
-      this.userRole === 'PROFESOR' ||
-      this.userRole === 'ADMINISTRADOR'
-    );
   }
 }

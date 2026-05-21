@@ -1,74 +1,29 @@
-    <nav class="ls" aria-label="Menú lateral">
-        <div class="ls__header">
-            <button class="ls__close" (click)="close()" aria-label="Cerrar menú">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
+<aside class="left-sidebar">
+  <nav class="left-sidebar__nav">
+    @if (canSeeDashboard) {
+      <button mat-button type="button" (click)="goTo('/dashboard')">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+    }
 
-        <!--Cuerpo-->
-        <div class="ls__body">
-            <!--Inicio-->
-            <button type="button" class="ls__link" routerLink="/" 
-                    routerLinkActive="active" aria-label="Ir a inicio">
-                <i class="bi bi-house-door"></i>
-                INICIO
-            </button>
+    <button mat-button type="button" (click)="goTo('/posts')">
+      <mat-icon>article</mat-icon>
+      <span>Publicaciones</span>
+    </button>
 
-            <!--Propósito-->
-            <button type="button" class="ls__link"
-                    routerLink="/proposito" routerLinkActive="active" aria-label="Ir a propósito">
-                <i class="bi bi-bullseye"></i>
-                PROPÓSITO
-            </button>
+    @if (canSeeCategories) {
+      <button mat-button type="button" (click)="goTo('/categories')">
+        <mat-icon>category</mat-icon>
+        <span>Categorías</span>
+      </button>
+    }
 
-            <!--Posts-->
-            <button type="button" class="ls__link"
-                    routerLink="/posts" routerLinkActive="active" aria-label="Ir a posts">
-                <i class="bi bi-journal-text"></i>
-                POSTS
-            </button>
-
-            <!-- Categorias -->
-            <button type="button" class="ls__link"
-                    routerLink="/categorias" routerLinkActive="active" aria-label="Ir a categorías">
-                <i class="bi bi-tags"></i>
-                CATEGORÍAS
-            </button>
-
-            @if (!isLogin) {
-                <button type="button" class="ls__link"
-                        routerLink="/login" routerLinkActive="active" aria-label="Ir a login">
-                    <i class="bi bi-people"></i>
-                    LOGIN
-                </button>
-
-                <button type="button" class="ls__link"
-                        routerLink="/register" routerLinkActive="active" aria-label="Ir a registro">
-                    <i class="bi bi-person-plus"></i>
-                    REGISTRO
-                </button>
-            }
-
-            @if (isLogin) {
-                <!--Perfil-->
-                <button type="button" class="ls__link"
-                        routerLink="/profile" routerLinkActive="active" aria-label="Ir a perfil">
-                    <i class="bi bi-person"></i>
-                    PERFIL
-                </button>
-                <!--Cerrar sesión-->
-                <button type="button" class="ls__link" (click)="logout()" aria-label="Cerrar sesión">
-                    <i class="bi bi-box-arrow-right"></i>
-                    CERRAR SESIÓN
-                </button>
-                @if (isProfesorOrAdmin) {
-                    <!-- Dashboard -->
-                    <button type="button" routerLink="/dashboard" class="ls__link" aria-label="Ir a dashboard">
-                        <i class="bi bi-speedometer2"></i>
-                        DASHBOARD
-                    </button>
-                }
-            }
-
-        </div>
-    </nav>
+    @if (canSeeReports) {
+      <button mat-button type="button" (click)="goTo('/reports')">
+        <mat-icon>report</mat-icon>
+        <span>Reportes</span>
+      </button>
+    }
+  </nav>
+</aside>

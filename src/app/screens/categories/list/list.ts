@@ -2,54 +2,40 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
-import { Footer } from '../../../partials/footer/footer';
 import { Sidebar } from '../../../partials/sidebar/sidebar';
+import { Footer } from '../../../partials/footer/footer';
+import { AuthService } from '../../../services/auth.service';
+import {CategoriesService} from '../../../services/categorias-service';
+import { CategoryItem } from '../../../shared/interfaces/categories.interface';
+import { UserRole } from '../../../models/auth-user.model';
 
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
-type CategoryStatus = 'ACTIVA' | 'INACTIVA';
-
-interface CategoryItem {
-  id: number;
-  nombre: string;
-  estado: CategoryStatus;
-  totalPosts: number;
-}
 
 @Component({
   selector: 'app-categories-list',
   standalone: true,
-  imports: [
-    ...SHARED_IMPORTS,
-    Navbar,
-    Sidebar,
-    Footer,
-  ],
+  imports: [...SHARED_IMPORTS, Navbar, Sidebar, Footer],
   templateUrl: './list.html',
   styleUrls: ['./list.scss'],
 })
 export class CategoriesList implements OnInit {
   public drawerOpen = false;
-  public userRole: UserRole = 'ADMINISTRADOR';
+  public isLogin = false;
+  public userRole: UserRole = 'ESTUDIANTE';
 
-  public categories: CategoryItem[] = [
-    { id: 1, nombre: 'Programación', estado: 'ACTIVA', totalPosts: 24 },
-    { id: 2, nombre: 'Matemáticas', estado: 'ACTIVA', totalPosts: 16 },
-    { id: 3, nombre: 'Redes', estado: 'INACTIVA', totalPosts: 9 },
-    { id: 4, nombre: 'Bases de Datos', estado: 'ACTIVA', totalPosts: 12 },
-  ];
+  public search = '';
+  public estado = 'TODAS';
+  public rows: CategoryItem[] = [];
 
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly categoriesService: CategoriesService,
+  ) {}
 
   ngOnInit(): void {
-    const savedRole = localStorage.getItem('userRole') as UserRole | null;
-
-    if (
-      savedRole === 'ESTUDIANTE' ||
-      savedRole === 'PROFESOR' ||
-      savedRole === 'ADMINISTRADOR'
-    ) {
-      this.userRole = savedRole;
-    }
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+    this.loadRows();
   }
 
   public toggleSidebar(): void {
@@ -60,31 +46,36 @@ export class CategoriesList implements OnInit {
     this.drawerOpen = false;
   }
 
-  public goToProfile(): void {
-    this.router.navigate(['/profile']);
+  public goCreate(): void {
+    this.router.navigate(['/categories/create']);
   }
 
-  public goCreateCategory(): void {
-    this.router.navigate(['/categories/form']);
+  public goEdit(id: number): void {
+    this.router.navigate(['/categories', id, 'edit']);
   }
 
-  public goEditCategory(categoryId: number): void {
-    this.router.navigate(['/categories', categoryId, 'edit']);
+  public inactivate(id: number): void {
+    this.categoriesService.inactivateCategory(id);
+    this.loadRows();
   }
 
-  public eliminarCategoria(category: CategoryItem): void {
-    if (category.totalPosts > 0) {
-      alert('No puedes eliminar una categoría con publicaciones.');
-      return;
-    }
+  public get filteredRows(): CategoryItem[] {
+    const q = this.search.trim().toLowerCase();
 
-    this.categories = this.categories.filter((item) => item.id !== category.id);
+    return this.rows.filter(row => {
+      const matchesSearch =
+        !q ||
+        row.nombre.toLowerCase().includes(q) ||
+        row.descripcion.toLowerCase().includes(q);
+
+      const matchesEstado =
+        this.estado === 'TODAS' || row.estado === this.estado;
+
+      return matchesSearch && matchesEstado;
+    });
   }
 
-  public get canManageCategories(): boolean {
-    return (
-      this.userRole === 'PROFESOR' ||
-      this.userRole === 'ADMINISTRADOR'
-    );
+  private loadRows(): void {
+    this.rows = this.categoriesService.getAllCategories(true);
   }
 }

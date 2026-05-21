@@ -2,21 +2,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; 
-  padding: 20px;    
+  min-height: 100vh;
+  padding: 20px;
   background: linear-gradient(to bottom, #dfe6ee, #cfd8e3);
 }
 
 .login-card-wrapper {
   position: relative;
-  width: 100%; 
+  width: 100%;
   display: flex;
   justify-content: center;
 }
 
 .login-card {
-  width: 100%;          
-  max-width: 380px;    
+  width: 100%;
+  max-width: 380px;
   padding: 2rem;
   border-radius: 20px;
   background: #f2f4f7;
@@ -96,7 +96,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #4CAF50; 
+  color: #4CAF50;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -113,7 +113,7 @@
   100% { transform: translateY(0); }
 }
 
-//UX PENDIENTE 
+//UX PENDIENTE
 
 //Responsivo
 

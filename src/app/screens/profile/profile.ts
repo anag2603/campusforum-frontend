@@ -1,10 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared_imports';
 import { Navbar } from '../../partials/navbar/navbar';
-import { Footer } from "../../partials/footer/footer";
 import { Sidebar } from '../../partials/sidebar/sidebar';
-import { CommonModule } from '@angular/common';
-import { S } from '@angular/cdk/keycodes';
+import { Footer } from '../../partials/footer/footer';
+import { AuthService } from '../../services/auth.service';
+import { UserRole } from '../../models/auth-user.model';
+
+interface ProfileForm {
+  firstName: string;
+  lastName: string;
+  lastNameMother: string;
+  email: string;
+  role: UserRole;
+  avatar: string;
+}
+
+interface ProfileErrors {
+  firstName?: string;
+  lastName?: string;
+  lastNameMother?: string;
+  email?: string;
+}
 
 @Component({
   selector: 'app-profile',
@@ -12,63 +28,112 @@ import { S } from '@angular/cdk/keycodes';
   imports: [
     ...SHARED_IMPORTS,
     Navbar,
-    Footer,
     Sidebar,
-    //RouterLink,
-    CommonModule
+    Footer,
   ],
   templateUrl: './profile.html',
-  styleUrl: './profile.scss',
+  styleUrls: ['./profile.scss'],
 })
-export class ProfileScreen implements OnInit{
-
-  ngOnInit(): void {}
-
-  isAvatarGalleryVisible: boolean = false;
-
-  // Simulación de datos de usuario (dummy data)
-  user = {
-    //TODO: Reemplazar con datos reales del usuario autenticado y añadir más campos según sea necesario
-    first_name: 'Valeria Elizabeth',
-    last_name: 'Rojo',
-    secondary_last_name: 'Hernández',  
-    email: 'valeria.rojo@uabc.edu.mx',
-    avatar: 'assets/images/avatares/avatar-original.png'
-  }
-
-  // Controla si la barra lateral (sidebar) está abierta
-  public isSidebarOpen: boolean = false;
-
-  // Simulación de estado de inicio de sesión
-  // TODO: Se debe reemplazar con un servicio de autenticación real
+export class Profile implements OnInit {
+  public drawerOpen: boolean = false;
   public isLogin: boolean = false;
+  public userRole: UserRole = 'ESTUDIANTE';
 
-  // Controla si el menú hamburguesa está abierto (móvil)
-  public menuAbierto = false;
+  public form: ProfileForm = {
+    firstName: '',
+    lastName: '',
+    lastNameMother: '',
+    email: '',
+    role: 'ESTUDIANTE',
+    avatar: 'assets/images/avatares/avatar-gorra-lentes.png',
+  };
 
-  // Método para cerrar la barra lateral (sidebar)
-  closeSidebar() {
-    this.isSidebarOpen = false;
+  public errors: ProfileErrors = {};
+  public successMessage: string = '';
+
+  public avatars: string[] = [
+    'assets/images/avatares/avatar-original.png',
+    'assets/images/avatares/avatar-lentes.png',
+    'assets/images/avatares/avatar-gorra-lentes.png',
+    'assets/images/avatares/avatar-mono.png',
+    'assets/images/avatares/avatar-navidad.png',
+    'assets/images/avatares/avatar-navidad-lentes.png',
+  ];
+
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
+
+  ngOnInit(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+
+    this.form = {
+      firstName: this.authService.getUserFirstName(),
+      lastName: this.authService.getUserLastName(),
+      lastNameMother: this.authService.getUserLastNameMother(),
+      email: this.authService.getUserEmail(),
+      role: this.userRole,
+      avatar: this.authService.getUserAvatar() || 'assets/images/avatares/avatar-gorra-lentes.png',
+    };
   }
 
-  // Método para alternar la visibilidad de la barra lateral (sidebar)
   public toggleSidebar(): void {
-    this.isSidebarOpen = !this.isSidebarOpen;
+    this.drawerOpen = !this.drawerOpen;
   }
 
-  public alternarMenu(): void {
-    this.menuAbierto = !this.menuAbierto;
+  public closeSidebar(): void {
+    this.drawerOpen = false;
   }
 
-  // 🔹 Mostrar/ocultar galería
-  toggleAvatarGallery() {
-    this.isAvatarGalleryVisible = !this.isAvatarGalleryVisible;
+  public selectAvatar(avatar: string): void {
+    this.form.avatar = avatar;
+    this.successMessage = '';
   }
 
-  // 🔹 Seleccionar avatar
-  selectAvatar(img: string) {
-    this.user.avatar = img;
-    this.isAvatarGalleryVisible = false;
+  public onAvatarError(): void {
+    this.form.avatar = 'assets/images/avatares/avatar-original.png';
   }
 
+  public saveProfile(): void {
+    this.errors = {};
+    this.successMessage = '';
+
+    if (!this.form.firstName.trim()) {
+      this.errors.firstName = 'El nombre es obligatorio.';
+    }
+
+    if (!this.form.lastName.trim()) {
+      this.errors.lastName = 'El apellido paterno es obligatorio.';
+    }
+
+    if (!this.form.lastNameMother.trim()) {
+      this.errors.lastNameMother = 'El apellido materno es obligatorio.';
+    }
+
+    if (!this.form.email.trim()) {
+      this.errors.email = 'El correo institucional es obligatorio.';
+    } else if (!this.form.email.includes('@')) {
+      this.errors.email = 'Ingresa un correo válido.';
+    }
+
+    if (Object.keys(this.errors).length > 0) {
+      return;
+    }
+
+    const result = this.authService.updateProfile({
+      firstName: this.form.firstName.trim(),
+      lastName: this.form.lastName.trim(),
+      lastNameMother: this.form.lastNameMother.trim(),
+      email: this.form.email.trim(),
+      avatar: this.form.avatar,
+    });
+
+    if (!result.ok) {
+      this.errors.email = result.error;
+      return;
+    }
+
+    this.successMessage = 'Perfil actualizado correctamente.';
+  }
 }

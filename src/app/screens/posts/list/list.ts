@@ -1,21 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { SHARED_IMPORTS } from '../../../shared/shared_imports';
 import { Navbar } from '../../../partials/navbar/navbar';
 import { Footer } from '../../../partials/footer/footer';
-import { Sidebar } from "../../../partials/sidebar/sidebar";
-
-type UserRole = 'ESTUDIANTE' | 'PROFESOR' | 'ADMINISTRADOR';
-
-interface PostItem {
-  id: number;
-  titulo: string;
-  contenido: string;
-  categoria: string;
-  autor: string;
-  fecha: string;
-  comentarios: number;
-}
+import { Sidebar } from '../../../partials/sidebar/sidebar';
+import { AuthService } from '../../../services/auth.service';
+import { PostsService, PostListItem } from '../../../services/posts-service';
+import { ReportsService } from '../../../services/reports-service';
+import { UserRole } from '../../../models/auth-user.model';
+import { ReportPostModal } from '../../../modals/report-post-modal/report-post-modal';
 
 @Component({
   selector: 'app-posts-list',
@@ -25,83 +19,36 @@ interface PostItem {
     Navbar,
     Sidebar,
     Footer,
-    Sidebar
-],
+  ],
   templateUrl: './list.html',
   styleUrls: ['./list.scss'],
 })
 export class PostsList implements OnInit {
-  public drawerOpen = false;
+  public drawerOpen: boolean = false;
+  public isLogin: boolean = false;
   public userRole: UserRole = 'ESTUDIANTE';
-
   public currentUserName: string = '';
 
   public search: string = '';
   public selectedCategory: string = 'TODAS';
 
-  public categories: string[] = [
-    'TODAS',
-    'Programación',
-    'Matemáticas',
-    'Inteligencia Artificial',
-    'Bases de Datos',
-    'Redes',
-  ];
+  public categories: string[] = ['TODAS'];
+  public page: number = 1;
+  public pageSize: number = 6;
 
-  public posts: PostItem[] = [
-    {
-      id: 1,
-      titulo: '¿Cómo empezar con Angular?',
-      contenido: 'Quiero conocer una ruta clara para comenzar a trabajar con Angular desde cero.',
-      categoria: 'Programación',
-      autor: 'Ana López',
-      fecha: '22/03/2026',
-      comentarios: 14,
-    },
-    {
-      id: 2,
-      titulo: 'Dudas sobre normalización en bases de datos',
-      contenido: 'Tengo dudas con primera, segunda y tercera forma normal para un proyecto escolar.',
-      categoria: 'Bases de Datos',
-      autor: 'Carlos Pérez',
-      fecha: '21/03/2026',
-      comentarios: 8,
-    },
-    {
-      id: 3,
-      titulo: 'Recursos para aprender redes',
-      contenido: 'Compartan libros, videos o prácticas para entender mejor subnetting y VLANs.',
-      categoria: 'Redes',
-      autor: 'María Torres',
-      fecha: '20/03/2026',
-      comentarios: 11,
-    },
-    {
-      id: 4,
-      titulo: 'Aplicaciones de IA en educación',
-      contenido: 'Me interesa debatir cómo se puede usar la inteligencia artificial en contextos académicos.',
-      categoria: 'Inteligencia Artificial',
-      autor: 'Luis Ramírez',
-      fecha: '19/03/2026',
-      comentarios: 17,
-    },
-  ];
+  public posts: PostListItem[] = [];
 
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authService: AuthService,
+    private readonly dialog: MatDialog,
+    private readonly postsService: PostsService,
+    private readonly reportsService: ReportsService,
+  ) {}
 
   ngOnInit(): void {
-    const savedRole = localStorage.getItem('userRole') as UserRole | null;
-    const savedUserName = localStorage.getItem('userName');
-
-    if (
-      savedRole === 'ESTUDIANTE' ||
-      savedRole === 'PROFESOR' ||
-      savedRole === 'ADMINISTRADOR'
-    ) {
-      this.userRole = savedRole;
-    }
-
-    this.currentUserName = savedUserName ? savedUserName.trim() : '';
+    this.syncAuthState();
+    this.loadPosts();
   }
 
   public toggleSidebar(): void {
@@ -113,7 +60,14 @@ export class PostsList implements OnInit {
   }
 
   public goCreatePost(): void {
-    this.router.navigate(['/posts/create']);
+    if (!this.isLogin) {
+      this.router.navigate(['/login'], {
+        queryParams: { redirectTo: '/posts/form' },
+      });
+      return;
+    }
+
+    this.router.navigate(['/posts/form']);
   }
 
   public goPostDetail(postId: number): void {
@@ -121,20 +75,54 @@ export class PostsList implements OnInit {
   }
 
   public goEditPost(postId: number): void {
-    this.router.navigate(['/posts', postId, 'edit']);
+    this.router.navigate(['/posts/form', postId]);
   }
 
-  public reportarPost(postId: number): void {
-    this.router.navigate(['/reports/create'], {
-      queryParams: {
-        type: 'post',
-        referenciaId: postId,
-        postId,
-      },
+  public goLogin(): void {
+    this.router.navigate(['/login'], {
+      queryParams: { redirectTo: '/posts' },
     });
   }
 
-  public isOwner(post: PostItem): boolean {
+  public reportarPost(postId: number): void {
+    const post = this.posts.find((item) => item.id === postId);
+
+    if (!post) {
+      return;
+    }
+
+    if (!this.canReportPosts) {
+      this.goLogin();
+      return;
+    }
+
+    const ref = this.dialog.open(ReportPostModal, {
+      width: '520px',
+      data: {
+        titulo: post.titulo,
+      },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+
+      this.reportsService.createReport(
+        {
+          tipo: 'POST',
+          referenciaId: post.id,
+          postId: post.id,
+          motivo: result.motivo,
+          descripcion: post.titulo,
+          estado: 'PENDIENTE',
+        },
+        this.currentUserName || 'Usuario'
+      );
+    });
+  }
+
+  public isOwner(post: PostListItem): boolean {
     if (!this.currentUserName.trim()) {
       return false;
     }
@@ -142,15 +130,36 @@ export class PostsList implements OnInit {
     return post.autor.trim().toLowerCase() === this.currentUserName.trim().toLowerCase();
   }
 
-  public canEditPost(post: PostItem): boolean {
+  public canEditPost(post: PostListItem): boolean {
     return this.canManagePosts || this.isOwner(post);
   }
 
-  public get filteredPosts(): PostItem[] {
+  public onSearchChange(): void {
+    this.page = 1;
+  }
+
+  public onCategoryChange(): void {
+    this.page = 1;
+  }
+
+  public prevPage(): void {
+    if (this.page > 1) {
+      this.page--;
+    }
+  }
+
+  public nextPage(): void {
+    if (this.page < this.totalPages) {
+      this.page++;
+    }
+  }
+
+  public get filteredPosts(): PostListItem[] {
     return this.posts.filter((post) => {
-      const text = this.search.toLowerCase();
+      const text = this.search.trim().toLowerCase();
 
       const matchesSearch =
+        !text ||
         post.titulo.toLowerCase().includes(text) ||
         post.contenido.toLowerCase().includes(text) ||
         post.autor.toLowerCase().includes(text);
@@ -163,15 +172,45 @@ export class PostsList implements OnInit {
     });
   }
 
+  public get paginatedPosts(): PostListItem[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.filteredPosts.slice(start, start + this.pageSize);
+  }
+
+  public get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredPosts.length / this.pageSize));
+  }
+
   public get canManagePosts(): boolean {
     return this.userRole === 'PROFESOR' || this.userRole === 'ADMINISTRADOR';
   }
 
   public get canCreatePost(): boolean {
-    return true;
+    return this.isLogin;
   }
 
   public get canReportPosts(): boolean {
-    return true;
+    return this.isLogin;
+  }
+
+  public get isPublicView(): boolean {
+    return !this.isLogin;
+  }
+
+  private syncAuthState(): void {
+    this.isLogin = this.authService.isAuthenticated();
+    this.userRole = this.authService.getUserRole() ?? 'ESTUDIANTE';
+    this.currentUserName = this.authService.getUserName();
+  }
+
+  private loadPosts(): void {
+    this.posts = this.isLogin
+      ? this.postsService.getAllPosts()
+      : this.postsService.getPublicPosts();
+
+    this.categories = [
+      'TODAS',
+      ...this.postsService.getCategories().map((item) => item.nombre),
+    ];
   }
 }
