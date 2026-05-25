@@ -115,13 +115,19 @@ export class PostsForm implements OnInit {
       return;
     }
 
+    const userId = this.authService.getUserId();
+
+    console.log('USER ID:', userId);
+    console.log('TIPO:', typeof userId);
+
     const backendPayload = {
       title: this.post.titulo.trim(),
       content: this.post.contenido.trim(),
-      author: 2
+      author: Number(userId),
     };
 
     console.log('Payload:', backendPayload);
+    
     this.postsService.createPostApi(backendPayload)
       .subscribe({
         next: (response) => {
