@@ -94,6 +94,8 @@ export class PostsCreate implements OnInit {
 
   public submit(): void {
 
+    console.log('ENTRÓ AL SUBMIT');
+
     const post = this.obtenerPostDesdeFormulario();
 
     this.errors = this.postsService.validarPost(post);
@@ -105,17 +107,20 @@ export class PostsCreate implements OnInit {
     const backendPayload = {
       title: post.titulo.trim(),
       content: post.contenido.trim(),
-      author: 1
+      //author: 1
     };
+    
+    console.log('Payload:', backendPayload);
 
     this.postsService.createPostApi(backendPayload)
       .subscribe({
 
         next: (response) => {
 
+          console.log('POST EXITOSO');
           console.log('Post creado:', response);
 
-          this.router.navigate(['/posts']);
+          window.location.href = '/posts';
         },
 
         error: (error) => {
@@ -124,6 +129,7 @@ export class PostsCreate implements OnInit {
 
         }
       });
+      
   }
 
   /* =========================
@@ -159,4 +165,5 @@ export class PostsCreate implements OnInit {
       this.userRole === 'ADMINISTRADOR'
     );
   }
+  
 }

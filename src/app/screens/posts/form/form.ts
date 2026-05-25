@@ -115,14 +115,28 @@ export class PostsForm implements OnInit {
       return;
     }
 
-    const result = this.postsService.createPost(this.post, this.currentUserName);
+    const backendPayload = {
+      title: this.post.titulo.trim(),
+      content: this.post.contenido.trim(),
+      author: 2
+    };
 
-    if (!result.ok && result.errors) {
-      this.errors = result.errors;
-      return;
-    }
+    console.log('Payload:', backendPayload);
+    this.postsService.createPostApi(backendPayload)
+      .subscribe({
+        next: (response) => {
 
-    this.router.navigate(['/posts', result.postId]);
+            console.log('POST EXITOSO');
+            console.log('Post creado:', response);
+            this.router.navigate(['/posts']);
+        },
+
+        error: (error) => {
+            console.error('ERROR creando post:', error);
+            console.error(error.error);
+            alert('Hubo un error al crear el post. Por favor, intenta nuevamente =(.');
+        }
+      });
   }
 
   public limpiar(): void {
