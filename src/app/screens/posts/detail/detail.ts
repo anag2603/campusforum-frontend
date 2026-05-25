@@ -273,16 +273,40 @@ this.reportsService.createReport(
   }
 
   private loadPost(): void {
-    const foundPost = this.postsService.getPostById(this.postId);
+    
+    this.postsService.getPostByIdApi(this.postId)
+      .subscribe({
 
-    if (!foundPost) {
-      this.router.navigate(['/posts']);
-      return;
-    }
+        next: (response) => {
 
-    this.post = foundPost;
+          console.log('Post detalle:', response);
 
-    const foundCategory = this.categories.find((item) => item.id === foundPost.categoriaId);
-    this.categoriaNombre = foundCategory ? foundCategory.nombre : 'Sin categoría';
+          this.post = {
+
+            id: response.id,
+            titulo: response.title,
+            contenido: response.content,
+            autor: `Usuario ${response.author}`,
+            fecha: response.creation,
+            categoriaId: 1,
+            etiquetas: '',
+            estado: 'PUBLICADO',
+            comentarios: []
+
+          };
+
+          this.categoriaNombre = 'General';
+
+        },
+
+        error: (error) => {
+
+          console.error('Error cargando detalle:', error);
+
+          this.router.navigate(['/posts']);
+
+        }
+
+      });
   }
 }

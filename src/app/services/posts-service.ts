@@ -278,6 +278,10 @@ export class PostsService {
     return this.http.get(this.apiUrl);
   }
 
+  public getPostByIdApi(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}${id}/`);
+  }
+
   public updatePost(
     postId: number,
     post: PostForm
