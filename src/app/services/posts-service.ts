@@ -321,10 +321,8 @@ export class PostsService {
     return { ok: true };
   }
 
-  public deletePost(postId: number): boolean {
-    const before = this.posts.length;
-    this.posts = this.posts.filter((item) => item.id !== postId);
-    return this.posts.length < before;
+  deletePost(postId: number) {
+    return this.http.delete(`${this.apiUrl}${postId}/`);
   }
 
   public addComment(

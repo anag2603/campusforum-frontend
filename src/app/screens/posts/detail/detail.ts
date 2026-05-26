@@ -200,8 +200,14 @@ this.reportsService.createReport(
 
     ref.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        this.postsService.deletePost(this.postId);
-        this.router.navigate(['/posts']);
+        this.postsService.deletePost(this.postId).subscribe({
+          next: () => {
+            this.router.navigate(['/posts']);
+          },
+          error: (err) => {
+            console.error('Error eliminando publicación:', err);
+          }
+        });
       }
     });
   }
