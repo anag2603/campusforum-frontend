@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  url_api: 'https://TU_DOMINIO_PRODUCCION.appspot.com'
+  url_api: 'https://campusforum-backend.onrender.com'
 };
