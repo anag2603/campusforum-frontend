@@ -282,17 +282,16 @@ this.reportsService.createReport(
           console.log('Post detalle:', response);
 
           this.post = {
-
             id: response.id,
             titulo: response.title,
             contenido: response.content,
-            autor: `Usuario ${response.author}`,
+            autor:
+              `${response.author.first_name} ${response.author.last_name}`,
             fecha: response.creation,
-            categoriaId: 1,
-            etiquetas: '',
-            estado: 'PUBLICADO',
+            categoriaId: response.categoria?.id ?? 0,
+            etiquetas: response.etiquetas ?? '',
+            estado: response.estado ?? 'PUBLICADO',
             comentarios: []
-
           };
 
           this.categoriaNombre = 'General';

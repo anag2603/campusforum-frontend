@@ -282,6 +282,10 @@ export class PostsService {
     return this.http.get(`${this.apiUrl}${id}/`);
   }
 
+  public updatePostApi(id: number, post: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${id}/`, post);
+  }
+
   public updatePost(
     postId: number,
     post: PostForm

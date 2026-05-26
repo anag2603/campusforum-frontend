@@ -211,14 +211,16 @@ export class PostsList implements OnInit {
         next: (response) => {
           console.log(response);
 
-          this.posts = response.results.map((post: any) => ({
+          const postsArray = response.results ?? response;
+
+          this.posts = postsArray.map((post: any) => ({
 
             id: post.id,
             titulo: post.title,
             contenido: post.content,
-            autor: `Usuario ${post.author}`,
+            autor: `${post.author.first_name} ${post.author.last_name}`,
             fecha: post.creation,
-            categoria: 'Programación',
+            categoria: post.categoria?.nombre ?? 'Sin categoría',
             comentarios: 0
 
           }));
