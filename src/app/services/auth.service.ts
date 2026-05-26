@@ -232,4 +232,11 @@ export class AuthService {
     if (roles.includes('profesor')) return 'PROFESOR';
     return 'ESTUDIANTE';
   }
+
+  public getUserId(): number | null {
+
+    const currentUser = this.getCurrentUser();
+
+    return currentUser ? currentUser.id : null;
+  }
 }

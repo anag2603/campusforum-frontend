@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { ValidatorService } from './tools/validator-service';
 import { ErrorsService } from './tools/errors-service';
 import { CategoriesService } from './categorias-service';
+
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import {
   PostForm,
   PostErrors,
@@ -26,6 +29,9 @@ export type {
   providedIn: 'root',
 })
 export class PostsService {
+
+  private apiUrl = 'http://127.0.0.1:8000/posts/';
+
   private posts: PostDetailItem[] = [
     {
       id: 1,
@@ -183,7 +189,8 @@ export class PostsService {
   constructor(
     private readonly validadorService: ValidatorService,
     private readonly errorsService: ErrorsService,
-    private readonly categoriesService: CategoriesService
+    private readonly categoriesService: CategoriesService,
+    private readonly http: HttpClient
   ) {}
 
   public esquemaPost(): PostForm {
@@ -263,6 +270,22 @@ export class PostsService {
     };
   }
 
+  public createPostApi(post: any): Observable<any> {
+    return this.http.post(this.apiUrl, post);
+  } 
+
+  public getPostsApi(): Observable<any> {
+    return this.http.get(this.apiUrl);
+  }
+
+  public getPostByIdApi(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}${id}/`);
+  }
+
+  public updatePostApi(id: number, post: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${id}/`, post);
+  }
+
   public updatePost(
     postId: number,
     post: PostForm
@@ -298,10 +321,8 @@ export class PostsService {
     return { ok: true };
   }
 
-  public deletePost(postId: number): boolean {
-    const before = this.posts.length;
-    this.posts = this.posts.filter((item) => item.id !== postId);
-    return this.posts.length < before;
+  deletePost(postId: number) {
+    return this.http.delete(`${this.apiUrl}${postId}/`);
   }
 
   public addComment(

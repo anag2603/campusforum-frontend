@@ -204,13 +204,35 @@ export class PostsList implements OnInit {
   }
 
   private loadPosts(): void {
-    this.posts = this.isLogin
-      ? this.postsService.getAllPosts()
-      : this.postsService.getPublicPosts();
 
-    this.categories = [
-      'TODAS',
-      ...this.postsService.getCategories().map((item) => item.nombre),
-    ];
+    this.postsService.getPostsApi()
+      .subscribe({
+
+        next: (response) => {
+          console.log(response);
+
+          const postsArray = response.results ?? response;
+
+          this.posts = postsArray.map((post: any) => ({
+
+            id: post.id,
+            titulo: post.title,
+            contenido: post.content,
+            autor: `${post.author.first_name} ${post.author.last_name}`,
+            fecha: post.creation,
+            categoria: post.categoria?.nombre ?? 'Sin categoría',
+            comentarios: 0
+
+          }));
+
+        },
+
+        error: (error) => {
+
+          console.error('Error cargando posts:', error);
+
+        }
+
+      });
   }
 }

@@ -200,8 +200,14 @@ this.reportsService.createReport(
 
     ref.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
-        this.postsService.deletePost(this.postId);
-        this.router.navigate(['/posts']);
+        this.postsService.deletePost(this.postId).subscribe({
+          next: () => {
+            this.router.navigate(['/posts']);
+          },
+          error: (err) => {
+            console.error('Error eliminando publicación:', err);
+          }
+        });
       }
     });
   }
@@ -273,16 +279,39 @@ this.reportsService.createReport(
   }
 
   private loadPost(): void {
-    const foundPost = this.postsService.getPostById(this.postId);
+    
+    this.postsService.getPostByIdApi(this.postId)
+      .subscribe({
 
-    if (!foundPost) {
-      this.router.navigate(['/posts']);
-      return;
-    }
+        next: (response) => {
 
-    this.post = foundPost;
+          console.log('Post detalle:', response);
 
-    const foundCategory = this.categories.find((item) => item.id === foundPost.categoriaId);
-    this.categoriaNombre = foundCategory ? foundCategory.nombre : 'Sin categoría';
+          this.post = {
+            id: response.id,
+            titulo: response.title,
+            contenido: response.content,
+            autor:
+              `${response.author.first_name} ${response.author.last_name}`,
+            fecha: response.creation,
+            categoriaId: response.categoria?.id ?? 0,
+            etiquetas: response.etiquetas ?? '',
+            estado: response.estado ?? 'PUBLICADO',
+            comentarios: []
+          };
+
+          this.categoriaNombre = 'General';
+
+        },
+
+        error: (error) => {
+
+          console.error('Error cargando detalle:', error);
+
+          this.router.navigate(['/posts']);
+
+        }
+
+      });
   }
 }

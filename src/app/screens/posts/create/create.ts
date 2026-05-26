@@ -93,6 +93,9 @@ export class PostsCreate implements OnInit {
   }
 
   public submit(): void {
+
+    console.log('ENTRÓ AL SUBMIT');
+
     const post = this.obtenerPostDesdeFormulario();
 
     this.errors = this.postsService.validarPost(post);
@@ -101,18 +104,32 @@ export class PostsCreate implements OnInit {
       return;
     }
 
-    const payload = {
-      titulo: post.titulo.trim(),
-      contenido: post.contenido.trim(),
-      categoriaId: post.categoriaId,
-      etiquetas: post.etiquetas.trim(),
-      estado: post.estado,
+    const backendPayload = {
+      title: post.titulo.trim(),
+      content: post.contenido.trim(),
+      //author: 1
     };
+    
+    console.log('Payload:', backendPayload);
 
-    console.log('Post a enviar al backend después:', payload);
+    this.postsService.createPostApi(backendPayload)
+      .subscribe({
 
-    localStorage.setItem('lastPostDraft', JSON.stringify(payload));
-    this.router.navigate(['/posts']);
+        next: (response) => {
+
+          console.log('POST EXITOSO');
+          console.log('Post creado:', response);
+
+          window.location.href = '/posts';
+        },
+
+        error: (error) => {
+
+          console.error('Error creando post:', error);
+
+        }
+      });
+      
   }
 
   /* =========================
@@ -148,4 +165,5 @@ export class PostsCreate implements OnInit {
       this.userRole === 'ADMINISTRADOR'
     );
   }
+  
 }
